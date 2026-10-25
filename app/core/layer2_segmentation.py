@@ -511,6 +511,9 @@ class SegmentationEngine:
             + "\n".join(segment_previews)
         )
 
+        if ai_service.is_local_mode:
+            return self._label_topics_locally(segments)
+
         try:
             raw_response = await ai_service.generate(prompt)
             topic_labels = self._parse_topic_labels(raw_response, len(segments))
@@ -518,14 +521,47 @@ class SegmentationEngine:
             for seg in segments:
                 if seg.id in topic_labels:
                     seg.topic = topic_labels[seg.id]
+                else:
+                    seg.topic = self._extract_single_topic_locally(seg)
 
         except Exception as exc:
-            logger.warning("Topic labelling AI call failed: %s", exc)
-            # Assign generic topic labels as fallback
-            for seg in segments:
-                seg.topic = f"Section {seg.id + 1}"
+            logger.info("Topic labelling AI unavailable (%s). Switched to local topic extraction.", exc)
+            return self._label_topics_locally(segments)
 
         return segments
+
+    def _label_topics_locally(self, segments: list[SemanticSegment]) -> list[SemanticSegment]:
+        """Extract descriptive topic titles using local keyword and phrase analysis."""
+        for seg in segments:
+            seg.topic = self._extract_single_topic_locally(seg)
+        return segments
+
+    @staticmethod
+    def _extract_single_topic_locally(seg: SemanticSegment) -> str:
+        """Derive a concise, meaningful title from segment text locally."""
+        import re
+        from collections import Counter
+
+        stop = {
+            "the", "and", "that", "this", "with", "from", "have", "were", "what",
+            "when", "where", "which", "there", "their", "about", "would", "could",
+            "should", "just", "like", "know", "going", "think", "really", "actually",
+            "want", "yeah", "okay", "well", "also", "then", "into", "more", "some",
+            "here", "them", "they", "been", "will", "your", "very", "much", "even"
+        }
+        words = re.findall(r"[A-Za-z]{3,}", seg.text)
+        # Prioritize capitalized terms
+        caps = [w for w in words if w[0].isupper() and w.lower() not in stop]
+        if caps:
+            top_caps = [w for w, _ in Counter(caps).most_common(2)]
+            return " & ".join(top_caps)
+
+        meaningful = [w.capitalize() for w in words if w.lower() not in stop]
+        if meaningful:
+            top_words = [w for w, _ in Counter(meaningful).most_common(2)]
+            return " & ".join(top_words)
+
+        return f"Section {seg.id + 1}: Overview"
 
     @staticmethod
     def _parse_topic_labels(raw: str, expected_count: int) -> dict[int, str]:

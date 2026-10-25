@@ -234,6 +234,7 @@ class ProcessingStatus(BaseModel):
 
     job_id: str
     video_url: str
+    video_title: str = ""
     stage: ProcessingStage = ProcessingStage.QUEUED
     progress: int = 0  # 0-100
     message: str = ""

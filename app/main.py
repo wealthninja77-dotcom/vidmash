@@ -130,12 +130,16 @@ async def process_video(job_id: str, url: str) -> None:
         status.progress = int(min(progress, 100))
         status.message = message
 
+    def _on_metadata(meta) -> None:
+        status.video_title = meta.title
+
     try:
         pipeline = VidMashPipeline()
         pdf_path, html_path = await pipeline.run(
             url=url,
             output_dir=output_dir,
             progress_callback=_progress,
+            on_metadata=_on_metadata,
         )
         status.pdf_path = pdf_path
         status.html_path = html_path
@@ -256,6 +260,7 @@ async def get_status(job_id: str) -> JSONResponse:
         content={
             "job_id": status.job_id,
             "url": status.video_url,
+            "video_title": status.video_title,
             "stage": status.stage.value,
             "progress": status.progress,
             "message": status.message,

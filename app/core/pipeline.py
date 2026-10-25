@@ -46,6 +46,7 @@ logger = logging.getLogger("vidmash.pipeline")
 ProgressCallback = Optional[
     Callable[[ProcessingStage, float, str], Coroutine[Any, Any, None]]
 ]
+MetadataCallback = Optional[Callable[[VideoMetadata], None]]
 
 
 class VidMashPipeline:
@@ -77,6 +78,7 @@ class VidMashPipeline:
         url: str,
         output_dir: str,
         progress_callback: ProgressCallback = None,
+        on_metadata: MetadataCallback = None,
     ) -> tuple[str, str]:
         """Execute the full 7-layer pipeline.
 
@@ -106,9 +108,18 @@ class VidMashPipeline:
 
         # ---- Layer 1: Extraction (0-15%) ---------------------------------
         t0 = time.perf_counter()
-        await _report(ProcessingStage.EXTRACTING, 5.0, "Downloading metadata and transcript...")
+        async def _layer1_progress(pct: float, msg: str) -> None:
+            await _report(ProcessingStage.EXTRACTING, pct, msg)
+
         try:
-            metadata, transcript_chunks = await self._extraction.extract(url)
+            metadata, transcript_chunks = await self._extraction.extract(
+                url, progress_callback=_layer1_progress
+            )
+            if on_metadata:
+                try:
+                    on_metadata(metadata)
+                except Exception as meta_err:
+                    logger.debug("on_metadata error: %s", meta_err)
             logger.info(
                 "Layer 1 complete – %d transcript chunks, title: %s",
                 len(transcript_chunks),

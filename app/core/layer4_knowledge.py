@@ -86,42 +86,50 @@ class KnowledgeGraphBuilder:
 
         combined_high_text = "\n\n".join(seg.text for seg, _ in high_value)
 
-        try:
-            ai_entities = await self._extract_entities_ai(
-                combined_high_text, ai_service
-            )
-            all_entities.extend(ai_entities)
-        except Exception as exc:
-            logger.warning("AI entity extraction failed: %s", exc)
+        if not getattr(ai_service, "is_local_mode", False):
+            try:
+                ai_entities = await self._extract_entities_ai(
+                    combined_high_text, ai_service
+                )
+                all_entities.extend(ai_entities)
+            except Exception as exc:
+                logger.info("AI entity extraction unavailable (%s), using local NER entities.", exc)
 
         # Deduplicate entities by name (case-insensitive)
         entities = self._deduplicate_entities(all_entities)
         logger.info("Total unique entities: %d", len(entities))
 
         # ----------------------------------------------------------
-        # 3. Find relationships (AI)
+        # 3. Find relationships (AI with seamless local fallback)
         # ----------------------------------------------------------
         relationships: list[Relationship] = []
-        if entities:
+        if entities and not getattr(ai_service, "is_local_mode", False):
             try:
                 relationships = await self._find_relationships(
                     entities, combined_high_text, ai_service
                 )
             except Exception as exc:
-                logger.warning("Relationship extraction failed: %s", exc)
+                logger.info("AI relationship extraction unavailable (%s). Switching to local graph builder.", exc)
+
+        if not relationships and entities:
+            relationships = self._build_local_relationships(entities, scored_segments)
 
         logger.info("Relationships found: %d", len(relationships))
 
         # ----------------------------------------------------------
-        # 4. Detect causal chains (AI)
+        # 4. Detect causal chains (AI with seamless local fallback)
         # ----------------------------------------------------------
         causal_chains: list[CausalChain] = []
-        try:
-            causal_chains = await self._detect_causal_chains(
-                combined_high_text, ai_service
-            )
-        except Exception as exc:
-            logger.warning("Causal chain detection failed: %s", exc)
+        if not getattr(ai_service, "is_local_mode", False):
+            try:
+                causal_chains = await self._detect_causal_chains(
+                    combined_high_text, ai_service
+                )
+            except Exception as exc:
+                logger.info("AI causal chain detection unavailable (%s). Switching to local causality detector.", exc)
+
+        if not causal_chains:
+            causal_chains = self._extract_local_causal_chains(scored_segments)
 
         logger.info("Causal chains found: %d", len(causal_chains))
 
@@ -702,3 +710,77 @@ class KnowledgeGraphBuilder:
         result = sorted(registry.values(), key=lambda e: e.mentions, reverse=True)
 
         return result
+
+    # ------------------------------------------------------------------
+    # Local fallback graph builders
+    # ------------------------------------------------------------------
+
+    def _build_local_relationships(
+        self,
+        entities: list[Entity],
+        scored_segments: list[tuple[SemanticSegment, DensityScore]],
+    ) -> list[Relationship]:
+        """Derive entity relationships locally via segment co-occurrence analysis."""
+        from collections import defaultdict
+        pair_counts: dict[tuple[str, str], int] = defaultdict(int)
+        top_names = [e.name for e in entities[:25]]
+
+        for seg, _ in scored_segments:
+            seg_text_lower = seg.text.lower()
+            present = [name for name in top_names if name.lower() in seg_text_lower]
+            for i in range(len(present)):
+                for j in range(i + 1, min(len(present), i + 4)):
+                    pair = (present[i], present[j])
+                    pair_counts[pair] += 1
+
+        relationships: list[Relationship] = []
+        for (src, tgt), count in sorted(pair_counts.items(), key=lambda kv: kv[1], reverse=True)[:25]:
+            strength = min(0.95, round(0.4 + (count * 0.15), 2))
+            relationships.append(
+                Relationship(
+                    source=src,
+                    target=tgt,
+                    relation_type="connected to",
+                    strength=strength,
+                )
+            )
+        return relationships
+
+    def _extract_local_causal_chains(
+        self,
+        scored_segments: list[tuple[SemanticSegment, DensityScore]],
+    ) -> list[CausalChain]:
+        """Extract cause-and-effect sequences locally using grammatical causal indicators."""
+        import re
+        chains: list[CausalChain] = []
+        causal_patterns = [
+            r"(.+?)\s+(?:leads to|results in|causes|enables|powers)\s+(.+)",
+            r"(.+?)\s+because\s+(.+)",
+            r"(?:in order to|to)\s+(.+?),\s*(?:you need to|we can|must)\s+(.+)",
+        ]
+
+        for seg, _ in scored_segments:
+            sentences = re.split(r"[.!?]\s+", seg.text)
+            for sentence in sentences:
+                sentence_clean = sentence.strip()
+                if len(sentence_clean) < 20 or len(sentence_clean) > 200:
+                    continue
+                for pat in causal_patterns:
+                    match = re.search(pat, sentence_clean, re.IGNORECASE)
+                    if match:
+                        step1 = match.group(1).strip().capitalize()
+                        step2 = match.group(2).strip().capitalize()
+                        if len(step1) > 5 and len(step2) > 5:
+                            chains.append(
+                                CausalChain(
+                                    steps=[step1[:60], step2[:60]],
+                                    description=sentence_clean[:100],
+                                )
+                            )
+                            break
+                if len(chains) >= 6:
+                    break
+            if len(chains) >= 6:
+                break
+
+        return chains
