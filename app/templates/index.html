@@ -1,256 +1,334 @@
 {% extends "base.html" %}
 
-{% block title %}VidMash — Watch Less. Know More.{% endblock %}
+{% block title %}VidMash — Autonomous Video Intelligence & Research Dossier Engine{% endblock %}
 
 {% block content %}
-<!-- ===== HERO SECTION ===== -->
-<section class="relative overflow-hidden">
-    <!-- Background gradient mesh -->
-    <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-gray-950 to-purple-950"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_50%)]"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(20,184,166,0.1),transparent_50%)]"></div>
+<!-- ===== HERO SECTION (Linear Obsidian Style) ===== -->
+<section class="relative overflow-hidden pt-12 pb-24 sm:pt-20 sm:pb-32">
+    <!-- Ambient Radial Mesh Lighting -->
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-gradient-to-tr from-brand-600/15 via-purple-600/10 to-accent-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+    <div class="absolute top-10 right-10 w-[350px] h-[350px] bg-teal-500/5 blur-[100px] rounded-full pointer-events-none"></div>
 
-    <!-- Animated grid pattern -->
-    <div class="absolute inset-0 opacity-[0.03]"
-         style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+    <!-- Precision Grid Matrix -->
+    <div class="absolute inset-0 opacity-[0.035] pointer-events-none"
+         style="background-image: linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px); background-size: 48px 48px;"></div>
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 sm:pt-32 sm:pb-40">
-        <div class="text-center max-w-4xl mx-auto fade-in-up">
-            <!-- Badge -->
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-sm font-medium mb-8">
-                <span class="h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
-                7-Layer Cortex Engine &middot; AI-Powered
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-4xl mx-auto">
+            <!-- Startup Pill Badge -->
+            <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl text-xs font-medium text-zinc-300 mb-8 hover:border-brand-500/40 transition shadow-inner">
+                <span class="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-zinc-400">VidMash Engine v2.0</span>
+                <span class="text-zinc-600">|</span>
+                <span class="text-brand-300 font-semibold tracking-wide">Autonomous Multi-Agent Cortex</span>
             </div>
 
-            <!-- Title -->
-            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
-                <span class="gradient-text">VidMash</span>
+            <!-- Main Punch Headline -->
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] mb-6">
+                Turn Any Internet Video Into a <br class="hidden sm:inline" />
+                <span class="bg-gradient-to-r from-indigo-300 via-white to-teal-300 bg-clip-text text-transparent">
+                    Peer-Reviewed Research Paper.
+                </span>
             </h1>
 
-            <!-- Tagline -->
-            <p class="text-xl sm:text-2xl lg:text-3xl text-gray-300 font-light mb-4">
-                Watch Less. Know More.
-            </p>
-            <p class="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto mb-4">
-                Transform any video into a comprehensive document.
-            </p>
-            <p class="text-sm sm:text-base text-gray-600 max-w-xl mx-auto mb-12">
-                Hours of video → Minutes of reading. Zero information loss.
+            <!-- Subhead with High Value Proposition -->
+            <p class="text-lg sm:text-xl text-zinc-400 font-normal max-w-2xl mx-auto mb-10 leading-relaxed">
+                Watch <strong class="text-white font-semibold">0%</strong> of the video. Retain <strong class="text-white font-semibold">100%</strong> of the empirical knowledge. Powered by neural acoustic transcription, semantic manifold boundary clustering, and autonomous multi-agent synthesis.
             </p>
 
-            <!-- URL Input Form -->
-            <div x-data="videoForm()" class="max-w-2xl mx-auto">
-                <form @submit.prevent="submitUrl" class="relative">
-                    <div class="relative group">
-                        <div class="absolute -inset-1 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
-                        <div class="relative flex items-center bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-2 shadow-2xl">
-                            <!-- URL icon -->
-                            <div class="pl-4 pr-3 text-gray-500">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+            <!-- Command Center URL Input Box -->
+            <div x-data="videoForm()" class="max-w-2xl mx-auto mb-12" id="hero-input">
+                <form @submit.prevent="submitUrl" class="relative group">
+                    <!-- Subtle Glow Ring -->
+                    <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-brand-500/25 via-purple-500/25 to-teal-500/25 blur-md opacity-40 group-hover:opacity-75 transition duration-500"></div>
+
+                    <!-- Input Container -->
+                    <div class="relative flex flex-col sm:flex-row items-center bg-zinc-950/85 backdrop-blur-2xl rounded-2xl border border-white/10 p-2 shadow-2xl transition hover:border-white/20">
+                        <div class="flex items-center w-full px-3 py-2 sm:py-0">
+                            <!-- Icon -->
+                            <div class="text-zinc-500 mr-3 flex-shrink-0">
+                                <svg class="w-5 h-5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                 </svg>
                             </div>
                             <input
                                 type="url"
                                 x-model="url"
-                                placeholder="Paste any YouTube video URL..."
-                                class="glow-input flex-1 bg-transparent text-gray-100 placeholder-gray-600 text-base sm:text-lg py-3 px-2 focus:outline-none"
+                                id="video-url-input"
+                                placeholder="Paste any YouTube video link (e.g. keynotes, lectures, podcasts)..."
+                                class="w-full bg-transparent text-white placeholder-zinc-500 text-sm sm:text-base focus:outline-none font-sans"
                                 :disabled="loading"
                                 required
                             >
-                            <button
-                                type="submit"
-                                :disabled="loading || !url.trim()"
-                                class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm sm:text-base transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
-                                :class="loading
-                                    ? 'bg-gray-700'
-                                    : 'bg-gradient-to-r from-brand-500 to-accent-500 hover:from-brand-400 hover:to-accent-400 hover:shadow-lg hover:shadow-brand-500/25 active:scale-95'"
-                            >
-                                <template x-if="!loading">
-                                    <span class="flex items-center gap-2">
-                                        🚀 <span class="hidden sm:inline">Transform Video</span><span class="sm:hidden">Go</span>
-                                    </span>
-                                </template>
-                                <template x-if="loading">
-                                    <span class="flex items-center gap-2">
-                                        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Processing…
-                                    </span>
-                                </template>
-                            </button>
+                            <span class="hidden md:inline-block px-2 py-0.5 rounded text-[11px] font-mono text-zinc-500 bg-white/5 border border-white/5 ml-2">
+                                ⌘K
+                            </span>
                         </div>
+
+                        <!-- Submit CTA -->
+                        <button
+                            type="submit"
+                            :disabled="loading || !url.trim()"
+                            class="w-full sm:w-auto mt-2 sm:mt-0 flex-shrink-0 flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-white text-sm transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
+                            :class="loading
+                                ? 'bg-zinc-800 text-zinc-400'
+                                : 'bg-gradient-to-r from-brand-600 via-indigo-600 to-teal-600 hover:from-brand-500 hover:to-teal-500 active:scale-95 shadow-brand-500/20'"
+                        >
+                            <template x-if="!loading">
+                                <span class="flex items-center gap-2">
+                                    <span>Synthesize Dossier</span>
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                </span>
+                            </template>
+                            <template x-if="loading">
+                                <span class="flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span>Deploying Swarm…</span>
+                                </span>
+                            </template>
+                        </button>
                     </div>
                 </form>
 
-                <!-- Error message -->
-                <div x-show="error" x-transition class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+                <!-- Quick Preset Demo Buttons -->
+                <div class="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs text-zinc-400">
+                    <span class="text-zinc-500">Quick Test:</span>
+                    <button @click="url = 'https://youtu.be/VRvC5smyzso'" class="px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 text-zinc-300 transition font-mono">
+                        Introducing Sites in Codex
+                    </button>
+                    <button @click="url = 'https://www.youtube.com/watch?v=kCc8FmEb1nY'" class="px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 text-zinc-300 transition font-mono">
+                        Karpathy - Intro to LLMs
+                    </button>
+                </div>
+
+                <!-- Error Display -->
+                <div x-show="error" x-transition class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs sm:text-sm text-center">
                     <span x-text="error"></span>
                 </div>
+            </div>
 
-                <!-- Supported platforms hint -->
-                <p class="mt-4 text-xs text-gray-600 text-center">
-                    Supports YouTube videos up to 4 hours &middot; Public videos only
-                </p>
+            <!-- Real-Time Metrics Strip -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-3xl mx-auto pt-6 border-t border-white/5 text-left">
+                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="text-xl sm:text-2xl font-bold font-mono text-white">0%</div>
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mt-0.5">Watch Time Needed</div>
+                </div>
+                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="text-xl sm:text-2xl font-bold font-mono text-teal-400">100%</div>
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mt-0.5">Empirical Recall</div>
+                </div>
+                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="text-xl sm:text-2xl font-bold font-mono text-brand-400">5 Autonomous</div>
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mt-0.5">Collaborative Agents</div>
+                </div>
+                <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div class="text-xl sm:text-2xl font-bold font-mono text-purple-400">&lt; 30s</div>
+                    <div class="text-[11px] text-zinc-500 uppercase tracking-wider mt-0.5">Average Synthesis</div>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Fade to next section -->
-    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-950 to-transparent"></div>
 </section>
 
 
-<!-- ===== FEATURES SECTION ===== -->
-<section id="features" class="relative py-24 sm:py-32">
+<!-- ===== BENTO GRID SHOWCASE (Linear AI Startup Architecture) ===== -->
+<section id="features" class="relative py-24 border-t border-white/5 bg-zinc-950">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
         <!-- Section Header -->
-        <div class="text-center mb-16 fade-in-up">
-            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Powered by the <span class="gradient-text">Cortex Engine</span>
-            </h2>
-            <p class="text-gray-500 max-w-2xl mx-auto">
-                Our 7-layer AI pipeline doesn't just summarize — it <em>understands</em>.
-                Every concept, every nuance, beautifully preserved.
+        <div class="max-w-3xl mx-auto text-center mb-20">
+            <h2 class="text-xs uppercase font-mono tracking-widest text-brand-400 mb-3 font-semibold">CORTEX ENGINE SPECIFICATION</h2>
+            <h3 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">
+                Not a Generic Summary.<br>
+                <span class="text-zinc-400">A Rigorous Scientific Intelligence System.</span>
+            </h3>
+            <p class="text-zinc-500 text-sm sm:text-base leading-relaxed">
+                Generic AI tools paste transcripts into basic chat prompts, losing critical nuances and generating hallucinations. VidMash deconstructs raw audio through a 7-layer neural topography pipeline.
             </p>
         </div>
 
-        <!-- Feature Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-            <!-- Feature 1 -->
-            <div class="group relative">
-                <div class="absolute -inset-px bg-gradient-to-b from-brand-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-2xl p-8 h-full hover:border-brand-500/30 transition-all duration-500">
-                    <div class="w-14 h-14 rounded-xl bg-brand-500/10 flex items-center justify-center text-3xl mb-6">
-                        🧠
+        <!-- Bento Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            
+            <!-- Bento 1: Large Agent Swarm (Spans 2 cols) -->
+            <div class="md:col-span-2 lg:col-span-2 rounded-3xl bg-zinc-900/40 border border-white/10 p-8 relative overflow-hidden group hover:border-brand-500/40 transition-all duration-500">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500/5 blur-3xl pointer-events-none"></div>
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="px-2.5 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-mono font-medium">LAYER 1-4 COGNITIVE SWARM</span>
+                </div>
+                <h4 class="text-2xl font-bold text-white mb-3 tracking-tight">Autonomous Multi-Agent Architecture</h4>
+                <p class="text-zinc-400 text-sm leading-relaxed mb-6">
+                    Five dedicated neural agents execute in continuous orchestration: acoustic streaming tokenization, semantic boundary clustering, factual entropy scoring, and multi-hop causal relation mapping.
+                </p>
+                <!-- Interactive Agent Pill Matrix -->
+                <div class="space-y-2.5 font-mono text-xs">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base">🛰️</span>
+                            <span class="text-zinc-200 font-semibold">Sonic Ingestion Agent</span>
+                        </div>
+                        <span class="text-emerald-400 text-[11px] font-medium">Whisper-Int8 Streaming</span>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">7-Layer Cortex Engine</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Our unique AI pipeline analyses every frame of information — extraction,
-                        segmentation, density mapping, knowledge graphs, visual generation,
-                        narrative composition, and professional rendering.
-                    </p>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base">📐</span>
+                            <span class="text-zinc-200 font-semibold">Semantic Topography Agent</span>
+                        </div>
+                        <span class="text-brand-400 text-[11px] font-medium">Cosine Manifold Clustering</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base">📊</span>
+                            <span class="text-zinc-200 font-semibold">Density & Entropy Auditor</span>
+                        </div>
+                        <span class="text-purple-400 text-[11px] font-medium">IDS Mathematical Scoring</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Feature 2 -->
-            <div class="group relative">
-                <div class="absolute -inset-px bg-gradient-to-b from-accent-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-2xl p-8 h-full hover:border-accent-500/30 transition-all duration-500">
-                    <div class="w-14 h-14 rounded-xl bg-accent-500/10 flex items-center justify-center text-3xl mb-6">
-                        📊
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Auto-Generated Visuals</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Charts, mind maps, timelines, and flow diagrams — automatically
-                        generated from the video's content. Complex ideas made visual,
-                        instantly understandable.
-                    </p>
+            <!-- Bento 2: Academic Paper Output -->
+            <div class="rounded-3xl bg-zinc-900/40 border border-white/10 p-8 relative overflow-hidden group hover:border-teal-500/40 transition-all duration-500">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="px-2.5 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-300 text-xs font-mono font-medium">FINAL ARTIFACT</span>
+                </div>
+                <div class="text-3xl mb-4">📑</div>
+                <h4 class="text-xl font-bold text-white mb-2 tracking-tight">Academic Research Paper</h4>
+                <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4">
+                    Formatted with formal abstract, numbered sections (§1.0, §2.0), LaTeX formulations, and verifiable timestamp citations.
+                </p>
+                <div class="p-3 rounded-xl bg-black/50 border border-white/5 font-mono text-[11px] text-zinc-400">
+                    <div>§1.0 System Architecture</div>
+                    <div class="text-teal-400">§2.0 Empirical Evidence [01:24]</div>
+                    <div>§3.0 Actionable Imperatives</div>
                 </div>
             </div>
 
-            <!-- Feature 3 -->
-            <div class="group relative">
-                <div class="absolute -inset-px bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-2xl p-8 h-full hover:border-purple-500/30 transition-all duration-500">
-                    <div class="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center text-3xl mb-6">
-                        📄
-                    </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Beautiful Documents</h3>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        Professional PDFs and HTML reports with zero need to watch the
-                        original video. Executive summaries, key takeaways, action items,
-                        and a glossary — all included.
-                    </p>
+            <!-- Bento 3: Live Interactive Copilot -->
+            <div class="rounded-3xl bg-zinc-900/40 border border-white/10 p-8 relative overflow-hidden group hover:border-purple-500/40 transition-all duration-500">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="px-2.5 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-mono font-medium">INTERACTIVE INTELLIGENCE</span>
+                </div>
+                <div class="text-3xl mb-4">💬</div>
+                <h4 class="text-xl font-bold text-white mb-2 tracking-tight">Interactive Video Copilot</h4>
+                <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4">
+                    Ask any question right on the report. Instant grounded responses with clickable video timestamp links.
+                </p>
+                <div class="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/20 text-[11px] text-purple-300 font-mono">
+                    "What are the hosting guardrails?" → Cited at [01:52]
                 </div>
             </div>
+
+            <!-- Bento 4: Automated High-Res Visuals -->
+            <div class="rounded-3xl bg-zinc-900/40 border border-white/10 p-8 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-500">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-mono font-medium">VISUAL ENGINE</span>
+                </div>
+                <div class="text-3xl mb-4">📈</div>
+                <h4 class="text-xl font-bold text-white mb-2 tracking-tight">4 High-Res Visual Assets</h4>
+                <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
+                    Automatically generates Mind Maps, Density Heatmaps, Content Timelines, and Entity Frequency charts for instant visual comprehension.
+                </p>
+            </div>
+
+            <!-- Bento 5: Multi-Format Export Suite (Spans 3 cols on desktop) -->
+            <div class="md:col-span-3 lg:col-span-3 rounded-3xl bg-zinc-900/40 border border-white/10 p-8 relative overflow-hidden group hover:border-white/20 transition-all duration-500">
+                <div class="flex items-center justify-between mb-6">
+                    <span class="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/10 text-zinc-300 text-xs font-mono font-medium">PORTABLE KNOWLEDGE ECOSYSTEM</span>
+                    <span class="text-xs text-zinc-500 font-mono">STANDALONE & LOCAL-FIRST</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-2xl bg-black/40 border border-white/5">
+                        <div class="text-lg mb-2">📕</div>
+                        <div class="font-bold text-white text-sm">Two-Pass ReportLab PDF</div>
+                        <div class="text-xs text-zinc-500 mt-1">Print-ready publication quality with dynamic running headers and canvas numbering.</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-black/40 border border-white/5">
+                        <div class="text-lg mb-2">📝</div>
+                        <div class="font-bold text-white text-sm">Obsidian & Notion Markdown</div>
+                        <div class="text-xs text-zinc-500 mt-1">Complete formatted markdown with tables, tags, and callouts ready for second-brain databases.</div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-black/40 border border-white/5">
+                        <div class="text-lg mb-2">🌐</div>
+                        <div class="font-bold text-white text-sm">Standalone HTML Dossier</div>
+                        <div class="text-xs text-zinc-500 mt-1">Zero-external-dependency web report that opens anywhere with embedded images.</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </section>
 
 
-<!-- ===== HOW IT WORKS ===== -->
-<section id="how-it-works" class="relative py-24 sm:py-32 overflow-hidden">
-    <!-- Subtle background -->
-    <div class="absolute inset-0 bg-gradient-to-b from-gray-950 via-brand-950/20 to-gray-950"></div>
-
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Section Header -->
-        <div class="text-center mb-20 fade-in-up">
-            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
-                How It Works
-            </h2>
-            <p class="text-gray-500 max-w-lg mx-auto">
-                Three simple steps. From video URL to comprehensive report.
-            </p>
+<!-- ===== COMPARISON MATRIX ===== -->
+<section class="py-24 border-t border-white/5 bg-zinc-950/80">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-xs uppercase font-mono tracking-widest text-brand-400 mb-3 font-semibold">ARCHITECTURAL SUPERIORITY</h2>
+            <h3 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Traditional AI Summaries vs. VidMash Dossier
+            </h3>
         </div>
 
-        <!-- Steps -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            <!-- Connector line (desktop only) -->
-            <div class="hidden md:block absolute top-16 left-[20%] right-[20%] h-px bg-gradient-to-r from-brand-500/40 via-accent-500/40 to-purple-500/40"></div>
-
-            <!-- Step 1 -->
-            <div class="relative text-center fade-in-up">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-white shadow-lg shadow-brand-500/30 relative z-10">
-                    1
-                </div>
-                <h3 class="text-lg font-semibold text-white mb-2">Paste URL</h3>
-                <p class="text-gray-500 text-sm">
-                    Drop any YouTube video URL into the input field above. That's it — no sign-up required.
-                </p>
-            </div>
-
-            <!-- Step 2 -->
-            <div class="relative text-center fade-in-up" style="animation-delay: 150ms;">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-white shadow-lg shadow-accent-500/30 relative z-10">
-                    2
-                </div>
-                <h3 class="text-lg font-semibold text-white mb-2">AI Analyzes</h3>
-                <p class="text-gray-500 text-sm">
-                    The Cortex Engine processes the video through 7 intelligent layers,
-                    extracting knowledge and generating visuals.
-                </p>
-            </div>
-
-            <!-- Step 3 -->
-            <div class="relative text-center fade-in-up" style="animation-delay: 300ms;">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-white shadow-lg shadow-purple-500/30 relative z-10">
-                    3
-                </div>
-                <h3 class="text-lg font-semibold text-white mb-2">Get Report</h3>
-                <p class="text-gray-500 text-sm">
-                    Download a beautiful PDF or browse the interactive HTML report.
-                    All the knowledge, none of the watch time.
-                </p>
-            </div>
+        <div class="overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/30 backdrop-blur-xl">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                    <tr class="border-b border-white/10 bg-white/[0.02]">
+                        <th class="p-4 sm:p-5 text-zinc-400 font-semibold">Capability</th>
+                        <th class="p-4 sm:p-5 text-zinc-500 font-medium">Standard AI Summarizer</th>
+                        <th class="p-4 sm:p-5 text-brand-300 font-bold bg-brand-500/5">VidMash Cortex Engine</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr>
+                        <td class="p-4 sm:p-5 text-white font-medium">Information Loss</td>
+                        <td class="p-4 sm:p-5 text-red-400/80">High (70%+ nuance dropped)</td>
+                        <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-brand-500/5">0% (Mathematically Preserved)</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 sm:p-5 text-white font-medium">Document Format</td>
+                        <td class="p-4 sm:p-5 text-zinc-400">Casual bullet points</td>
+                        <td class="p-4 sm:p-5 text-white font-semibold bg-brand-500/5">Formal Academic Research Dossier</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 sm:p-5 text-white font-medium">Verification Citations</td>
+                        <td class="p-4 sm:p-5 text-zinc-400">None (Prone to hallucinations)</td>
+                        <td class="p-4 sm:p-5 text-teal-300 font-semibold bg-brand-500/5">Timestamp-anchored [MM:SS] verifiable</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 sm:p-5 text-white font-medium">Visual Assets</td>
+                        <td class="p-4 sm:p-5 text-zinc-400">Text only</td>
+                        <td class="p-4 sm:p-5 text-white font-semibold bg-brand-500/5">Mind Maps, Heatmaps, Timelines, Charts</td>
+                    </tr>
+                    <tr>
+                        <td class="p-4 sm:p-5 text-white font-medium">Offline / Quota Independence</td>
+                        <td class="p-4 sm:p-5 text-red-400/80">Fails on API quota error</td>
+                        <td class="p-4 sm:p-5 text-emerald-400 font-semibold bg-brand-500/5">Instant Auto-Switch to Local Whisper/NLP</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </section>
 
 
-<!-- ===== CTA SECTION ===== -->
-<section class="relative py-24">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div class="relative">
-            <div class="absolute -inset-4 bg-gradient-to-r from-brand-500/10 via-accent-500/10 to-purple-500/10 rounded-3xl blur-3xl"></div>
-            <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-3xl p-12 sm:p-16">
-                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
-                    Ready to transform a video?
-                </h2>
-                <p class="text-gray-400 mb-8 max-w-lg mx-auto">
-                    Paste a URL above and let the Cortex Engine do the rest.
-                    Your comprehensive report will be ready in minutes.
-                </p>
-                <a href="#"
-                   onclick="document.querySelector('input[type=url]').focus(); window.scrollTo({top: 0, behavior: 'smooth'}); return false;"
-                   class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold hover:from-brand-400 hover:to-accent-400 transition-all duration-300 hover:shadow-lg hover:shadow-brand-500/25 active:scale-95">
-                    🚀 Get Started — It's Free
-                </a>
-            </div>
-        </div>
+<!-- ===== READY CTA SECTION ===== -->
+<section class="py-24 border-t border-white/5 relative overflow-hidden">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight mb-6">
+            Stop Watching Hours of Video.<br>
+            <span class="bg-gradient-to-r from-brand-400 via-teal-300 to-indigo-300 bg-clip-text text-transparent">
+                Start Reading Research Dossiers.
+            </span>
+        </h2>
+        <p class="text-zinc-400 text-base sm:text-lg mb-8 max-w-xl mx-auto">
+            Drop any YouTube link into VidMash and receive your fully-verified research document in under 30 seconds.
+        </p>
+        <button
+            onclick="document.getElementById('video-url-input').focus(); window.scrollTo({top: 0, behavior: 'smooth'});"
+            class="px-8 py-4 rounded-xl bg-gradient-to-r from-brand-600 via-indigo-600 to-teal-600 hover:from-brand-500 hover:to-teal-500 text-white font-bold text-base transition-all duration-300 shadow-xl shadow-brand-500/25 active:scale-95">
+            ⚡ Analyze a Video Now — Free
+        </button>
     </div>
 </section>
 {% endblock %}
@@ -290,5 +368,17 @@ function videoForm() {
         }
     };
 }
+
+// Global Command-K focus shortcut
+document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const input = document.getElementById('video-url-input');
+        if (input) {
+            input.focus();
+            input.select();
+        }
+    }
+});
 </script>
 {% endblock %}

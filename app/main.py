@@ -303,3 +303,133 @@ async def download_html(job_id: str) -> FileResponse:
         media_type="text/html",
         filename=f"vidmash_report_{job_id}.html",
     )
+
+
+from pydantic import BaseModel as PyBaseModel
+
+
+class ChatQuery(PyBaseModel):
+    message: str
+
+
+@app.post("/api/chat/{job_id}")
+async def chat_with_video(job_id: str, payload: ChatQuery) -> JSONResponse:
+    """Live interactive AI Copilot Q&A grounded in the video's intelligence dossier."""
+    settings = get_settings()
+    output_dir = Path(settings.OUTPUT_DIR) / job_id
+    report_json_path = output_dir / "report.json"
+
+    query = payload.message.strip()
+    if not query:
+        raise HTTPException(status_code=400, detail="Query cannot be empty")
+
+    if not report_json_path.exists():
+        if job_id not in jobs:
+            raise HTTPException(status_code=404, detail="Job not found or report not ready")
+        return JSONResponse(
+            content={
+                "answer": "This document is still being compiled by the Cortex Engine.",
+                "section": "Processing",
+                "timestamp": "00:00",
+                "seconds": 0,
+            }
+        )
+
+    try:
+        with open(report_json_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to read report data: {exc}")
+
+    meta = data.get("metadata", {})
+    title = meta.get("title", "the video")
+    sections = data.get("sections", [])
+    summary = data.get("executive_summary", "")
+
+    import re
+    words = set(re.findall(r"[a-zA-Z]{3,}", query.lower()))
+    scored_sections = []
+    for s in sections:
+        content = (s.get("title", "") + " " + s.get("content", "")).lower()
+        score = sum(1 for w in words if w in content)
+        scored_sections.append((score, s))
+
+    scored_sections.sort(key=lambda x: x[0], reverse=True)
+    best_sec = scored_sections[0][1] if scored_sections else {}
+    best_title = best_sec.get("title", "Key Discussion")
+    start_t = int(best_sec.get("timestamp_start", 0))
+    start_m, start_s = divmod(start_t, 60)
+    time_str = f"{start_m:02d}:{start_s:02d}"
+
+    from app.services.ai_service import AIService
+    ai = AIService()
+    answer = ""
+
+    if not ai.is_local_mode:
+        context_text = f"Title: {title}\nSummary: {summary[:500]}\n\n"
+        for _, sec in scored_sections[:2]:
+            context_text += f"Section: {sec.get('title')} [{sec.get('timestamp_start', 0)}s]:\n{sec.get('content')[:1200]}\n\n"
+
+        prompt = (
+            f"You are VidMash Intelligence Copilot. Answer the question about '{title}' "
+            f"concisely and authoritatively using ONLY the context provided. "
+            f"Always include the timestamp [{time_str}] where the topic is addressed.\n\n"
+            f"CONTEXT:\n{context_text}\n\nQUESTION: {query}"
+        )
+        try:
+            answer = await ai.generate(prompt)
+        except Exception:
+            answer = ""
+
+    if not answer:
+        sentences = [st.strip() for st in best_sec.get("content", "").split(".") if len(st.strip()) > 25]
+        matching_sentences = [st for st in sentences if any(w in st.lower() for w in words)]
+        if matching_sentences:
+            core_quote = ". ".join(matching_sentences[:2]) + "."
+        elif sentences:
+            core_quote = ". ".join(sentences[:2]) + "."
+        else:
+            core_quote = summary[:200]
+
+        answer = (
+            f"According to **{title}** at **[{time_str}]** in section *'{best_title}'*:\n\n"
+            f"> {core_quote}\n\n"
+            f"This addresses your inquiry directly without requiring you to watch the video."
+        )
+
+    return JSONResponse(
+        content={
+            "answer": answer,
+            "section": best_title,
+            "timestamp": time_str,
+            "seconds": start_t,
+        }
+    )
+
+
+@app.get("/api/download/markdown/{job_id}")
+async def download_markdown(job_id: str) -> FileResponse:
+    """Download the generated Markdown Research Dossier."""
+    settings = get_settings()
+    file_path = Path(settings.OUTPUT_DIR) / job_id / "report.md"
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Markdown report not found")
+    return FileResponse(
+        path=str(file_path),
+        media_type="text/markdown",
+        filename=f"vidmash_dossier_{job_id}.md",
+    )
+
+
+@app.get("/api/download/json/{job_id}")
+async def download_json(job_id: str) -> FileResponse:
+    """Download the raw structured JSON knowledge dataset."""
+    settings = get_settings()
+    file_path = Path(settings.OUTPUT_DIR) / job_id / "report.json"
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="JSON report not found")
+    return FileResponse(
+        path=str(file_path),
+        media_type="application/json",
+        filename=f"vidmash_data_{job_id}.json",
+    )

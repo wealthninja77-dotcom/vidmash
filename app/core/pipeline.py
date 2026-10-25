@@ -249,6 +249,23 @@ class VidMashPipeline:
         except Exception as exc:
             logger.error("Layer 7 failed: %s", exc)
             raise RuntimeError(f"Rendering failed: {exc}") from exc
+
+        # Save structured report JSON and Markdown for API & exports
+        report_json_path = os.path.join(output_dir, "report.json")
+        try:
+            with open(report_json_path, "w", encoding="utf-8") as f:
+                f.write(report.model_dump_json(indent=2))
+        except Exception as j_err:
+            logger.debug("Could not write report.json: %s", j_err)
+
+        report_md_path = os.path.join(output_dir, "report.md")
+        try:
+            md_content = self._generate_markdown(report)
+            with open(report_md_path, "w", encoding="utf-8") as f:
+                f.write(md_content)
+        except Exception as m_err:
+            logger.debug("Could not write report.md: %s", m_err)
+
         layer_timings["renderer"] = time.perf_counter() - t0
 
         await _report(ProcessingStage.COMPLETED, 100.0, "Processing complete! Document ready.")
@@ -303,3 +320,59 @@ class VidMashPipeline:
                 "score": getattr(item, "ids_score", 0.5),
                 "is_high_value": getattr(item, "is_high_value", False),
             }
+
+
+    @staticmethod
+    def _generate_markdown(report: DocumentReport) -> str:
+        """Render DocumentReport into an academic research paper markdown dossier."""
+        lines = [
+            f"# {report.metadata.title}",
+            "",
+            f"**Author / Channel:** {report.metadata.channel}  ",
+            f"**Original Duration:** {int(report.metadata.duration // 60)}m {int(report.metadata.duration % 60)}s  ",
+            f"**Synthesis Engine:** VidMash Autonomous 7-Layer Cortex Engine  ",
+            f"**Classification:** Primary Technical Research Dossier  ",
+            f"**Compression Factor:** {report.compression_ratio}  ",
+            "",
+            "---",
+            "",
+            "## Abstract",
+            "",
+            report.executive_summary or "No executive summary available.",
+            "",
+            "## Core Empirical Takeaways",
+            "",
+        ]
+        for idx, t in enumerate(report.key_takeaways, 1):
+            lines.append(f"{idx}. {t}")
+
+        lines.extend(["", "## Technical Deep Dive & Analysis", ""])
+        for sec in report.sections:
+            start_m, start_s = divmod(int(sec.timestamp_start), 60)
+            end_m, end_s = divmod(int(sec.timestamp_end), 60)
+            lines.append(f"### §{sec.order}.0 {sec.title} `[{start_m:02d}:{start_s:02d} - {end_m:02d}:{end_s:02d}]`")
+            lines.append("")
+            lines.append(sec.content)
+            lines.append("")
+
+        if report.action_items:
+            lines.extend(["## Actionable Implementation Matrix", ""])
+            lines.append("| Priority | Action Item | Source |")
+            lines.append("| :--- | :--- | :--- |")
+            for item in report.action_items:
+                p_badge = f"**{item.priority.upper()}**"
+                lines.append(f"| {p_badge} | {item.text} | Technical Findings |")
+            lines.append("")
+
+        if report.knowledge_graph.entities:
+            lines.extend(["## Knowledge Graph & Entity Ledger", ""])
+            top_ents = [f"`{e.name}` ({e.entity_type})" for e in report.knowledge_graph.entities[:15]]
+            lines.append("Key entities identified: " + ", ".join(top_ents))
+            lines.append("")
+
+        lines.extend([
+            "---",
+            "",
+            "*Synthesized autonomously by VidMash — Watch Less. Know More.*"
+        ])
+        return "\n".join(lines)
