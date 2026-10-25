@@ -32,9 +32,14 @@ class AIService:
     def __init__(self) -> None:
         """Initialise the Gemini SDK and select the model."""
         settings = get_settings()
-        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self._api_key: str = (settings.GEMINI_API_KEY or "").strip()
+        self._has_valid_key: bool = bool(
+            self._api_key and self._api_key not in ("your_gemini_api_key_here", "dummy", "")
+        )
+        if self._has_valid_key:
+            genai.configure(api_key=self._api_key)
         self._model_name: str = "gemini-2.0-flash"
-        logger.info("AIService initialised with model %s", self._model_name)
+        logger.info("AIService initialised with model %s (key configured: %s)", self._model_name, self._has_valid_key)
 
     # ------------------------------------------------------------------
     # Public API
@@ -58,6 +63,10 @@ class AIService:
         Returns:
             The raw text content of the model's response.
         """
+        if not self._has_valid_key:
+            raise ValueError(
+                "Gemini API key is not configured. Please set GEMINI_API_KEY in .env"
+            )
         generation_config: dict[str, Any] = {}
         if json_mode:
             generation_config["response_mime_type"] = "application/json"
