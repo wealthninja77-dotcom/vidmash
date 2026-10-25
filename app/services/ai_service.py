@@ -38,7 +38,7 @@ class AIService:
         )
         if self._has_valid_key:
             genai.configure(api_key=self._api_key)
-        self._model_name: str = "gemini-2.0-flash"
+        self._model_name: str = "gemini-3.5-flash"
         logger.info("AIService initialised with model %s (key configured: %s)", self._model_name, self._has_valid_key)
 
     # ------------------------------------------------------------------
