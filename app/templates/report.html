@@ -60,11 +60,17 @@
         }
     </style>
 </head>
-<body class="transition-colors duration-200"
+<body class="transition-colors duration-200 relative min-h-screen"
       :class="theme === 'dark' ? 'bg-[#000000] text-apple-textPrimary' : 'bg-paper-bg text-paper-textPrimary'">
 
+    <!-- Scenic Background for Dark Mode -->
+    <div x-show="theme === 'dark'" class="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none">
+        <img src="/static/img/background.jpg" alt="" class="w-full h-full object-cover object-center filter brightness-[0.40] contrast-[1.08] saturate-[1.12]">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black/92"></div>
+    </div>
+
     <!-- Precision Sticky Top Bar -->
-    <header class="sticky top-0 z-50 transition-colors duration-200 border-b backdrop-blur-2xl"
+    <header class="sticky top-0 z-50 transition-colors duration-200 border-b backdrop-blur-2xl relative"
             :class="theme === 'dark' ? 'bg-black/75 border-white/[0.08]' : 'bg-white/75 border-black/[0.08]'">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -104,7 +110,7 @@
 
 
     <!-- Main Research Paper Container -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16 relative z-10">
 
         <!-- Research Paper Document Header -->
         <div class="mb-12 pb-8 border-b"

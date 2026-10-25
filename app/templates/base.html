@@ -17,10 +17,10 @@
                         apple: {
                             black: '#000000',
                             canvas: '#050507',
-                            card: '#0e0e11',
-                            cardHover: '#141418',
-                            border: 'rgba(255, 255, 255, 0.08)',
-                            borderLight: 'rgba(255, 255, 255, 0.14)',
+                            card: 'rgba(14, 14, 17, 0.78)',
+                            cardHover: 'rgba(22, 22, 28, 0.88)',
+                            border: 'rgba(255, 255, 255, 0.09)',
+                            borderLight: 'rgba(255, 255, 255, 0.16)',
                             textPrimary: '#F5F5F7',
                             textSecondary: '#86868B',
                             textTertiary: '#636366',
@@ -78,15 +78,27 @@
 
     {% block head %}{% endblock %}
 </head>
-<body class="bg-apple-black text-apple-textPrimary font-sans antialiased min-h-screen flex flex-col selection:bg-apple-blue selection:text-white">
+<body class="bg-black text-apple-textPrimary font-sans antialiased min-h-screen flex flex-col selection:bg-apple-blue selection:text-white relative">
 
-    {% include "components/header.html" %}
+    <!-- Scenic Apple Landscape Background Wallpaper with Frosted Atmospheric Overlay -->
+    <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden select-none">
+        <img src="/static/img/background.jpg" alt="Atmospheric Mountain Landscape"
+             class="w-full h-full object-cover object-center filter brightness-[0.46] contrast-[1.08] saturate-[1.12]">
+        <!-- Apple frosted dark vignette & atmospheric gradient -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/65 via-black/35 to-black/85"></div>
+        <div class="absolute inset-0 backdrop-blur-[0.5px]"></div>
+    </div>
 
-    <main class="flex-1">
-        {% block content %}{% endblock %}
-    </main>
+    <!-- Main Foreground Application Container -->
+    <div class="relative z-10 flex flex-col min-h-screen">
+        {% include "components/header.html" %}
 
-    {% include "components/footer.html" %}
+        <main class="flex-1">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% include "components/footer.html" %}
+    </div>
 
     <!-- App JS -->
     <script src="/static/js/app.js"></script>
