@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+    <defs>
+        <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6366f1" />
+            <stop offset="50%" stop-color="#4f46e5" />
+            <stop offset="100%" stop-color="#14b8a6" />
+        </linearGradient>
+        <linearGradient id="accentGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#14b8a6" />
+            <stop offset="100%" stop-color="#2dd4bf" />
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+    </defs>
+
+    <!-- Document Background Card -->
+    <rect x="22" y="14" width="56" height="72" rx="12" fill="url(#primaryGrad)" filter="url(#glow)"/>
+    <rect x="24" y="16" width="52" height="68" rx="10" fill="#0f172a" stroke="#312e81" stroke-width="1.5" />
+
+    <!-- Document Text Lines -->
+    <rect x="34" y="28" width="32" height="3" rx="1.5" fill="#6366f1" opacity="0.8"/>
+    <rect x="34" y="36" width="22" height="3" rx="1.5" fill="#818cf8" opacity="0.6"/>
+
+    <!-- High-tech play triangle / synthesis pulse -->
+    <path d="M43 46L63 58L43 70V46Z" fill="url(#accentGrad)" />
+    <circle cx="63" cy="58" r="3" fill="#ffffff" />
+</svg>

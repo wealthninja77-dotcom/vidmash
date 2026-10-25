@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Processing — VidMash{% endblock %}
+
+{% block content %}
+<section class="relative min-h-[80vh] flex items-center justify-center py-16"
+         x-data="processingStatus('{{ job_id }}')">
+
+    <!-- Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-gray-950 to-purple-950"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(99,102,241,0.08),transparent_60%)]"></div>
+
+    <div class="relative w-full max-w-2xl mx-auto px-4">
+        <!-- Card -->
+        <div class="bg-gray-900/60 backdrop-blur-2xl border border-white/5 rounded-3xl p-8 sm:p-10 shadow-2xl">
+
+            <!-- Header -->
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-xs font-medium mb-4">
+                    <span class="h-1.5 w-1.5 rounded-full bg-brand-400"
+                          :class="stage !== 'completed' && stage !== 'failed' ? 'animate-pulse' : ''"></span>
+                    <span x-text="stage === 'completed' ? 'Done' : stage === 'failed' ? 'Error' : 'Processing'"></span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2" x-text="videoTitle">
+                    {{ video_title }}
+                </h1>
+                <p class="text-sm text-gray-500 font-mono truncate max-w-md mx-auto">{{ url }}</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-10">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-gray-400" x-text="message">Initialising…</span>
+                    <span class="text-sm font-mono text-brand-400" x-text="progress + '%'">0%</span>
+                </div>
+                <div class="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-700 ease-out"
+                         :class="stage === 'failed' ? 'bg-red-500' : 'bg-gradient-to-r from-brand-500 to-accent-500'"
+                         :style="'width: ' + progress + '%'">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage List -->
+            <div class="space-y-3 mb-10">
+                {% for s in stages %}
+                <div class="flex items-center gap-4 px-4 py-3 rounded-xl transition-colors duration-300"
+                     :class="getStageClass('{{ s.key }}')">
+                    <!-- Status icon -->
+                    <div class="flex-shrink-0 w-7 h-7 flex items-center justify-center">
+                        <template x-if="isStageComplete('{{ s.key }}')">
+                            <span class="text-accent-400 text-lg">✅</span>
+                        </template>
+                        <template x-if="isStageActive('{{ s.key }}')">
+                            <svg class="animate-spin h-5 w-5 text-brand-400" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </template>
+                        <template x-if="isStagePending('{{ s.key }}')">
+                            <span class="text-gray-700 text-lg">⬜</span>
+                        </template>
+                    </div>
+                    <!-- Label -->
+                    <span class="text-sm font-medium"
+                          :class="isStageActive('{{ s.key }}') ? 'text-white' : isStageComplete('{{ s.key }}') ? 'text-gray-400' : 'text-gray-600'">
+                        {{ s.label }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Completed State -->
+            <div x-show="stage === 'completed'" x-transition class="space-y-4">
+                <div class="p-4 bg-accent-500/10 border border-accent-500/20 rounded-xl text-center">
+                    <p class="text-accent-300 font-medium mb-1">🎉 Report ready!</p>
+                    <p class="text-accent-400/70 text-xs">Your document has been generated successfully.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <a :href="'/api/download/pdf/' + jobId"
+                       class="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 text-white font-semibold hover:from-brand-400 hover:to-brand-500 transition-all active:scale-95 shadow-lg shadow-brand-500/20">
+                        📥 Download PDF
+                    </a>
+                    <a :href="'/report/' + jobId"
+                       target="_blank"
+                       class="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-200 font-semibold hover:bg-white/10 hover:text-white transition-all active:scale-95">
+                        🌐 View HTML Report
+                    </a>
+                </div>
+            </div>
+
+            <!-- Failed State -->
+            <div x-show="stage === 'failed'" x-transition class="space-y-4">
+                <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                    <p class="text-red-400 font-medium mb-1">❌ Processing Failed</p>
+                    <p class="text-red-400/70 text-sm" x-text="errorMsg"></p>
+                </div>
+                <a href="/"
+                   class="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/5 border border-white/10 text-gray-300 font-semibold hover:bg-white/10 hover:text-white transition-all w-full">
+                    🔄 Try Again
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function processingStatus(jobId) {
+    return {
+        jobId: jobId,
+        stage: 'queued',
+        progress: 0,
+        message: 'Initialising…',
+        errorMsg: '',
+        videoTitle: '{{ video_title }}',
+        pollTimer: null,
+
+        // Ordered stage keys matching the backend enum values
+        stageOrder: [
+            'extracting',
+            'segmenting',
+            'analyzing',
+            'building_graph',
+            'generating_visuals',
+            'writing_narrative',
+            'rendering',
+        ],
+
+        init() {
+            this.poll();
+            this.pollTimer = setInterval(() => this.poll(), 2000);
+        },
+
+        async poll() {
+            try {
+                const resp = await fetch('/api/status/' + this.jobId);
+                if (!resp.ok) return;
+                const data = await resp.json();
+
+                this.stage = data.stage;
+                this.progress = data.progress;
+                this.message = data.message;
+                this.errorMsg = data.error || '';
+                if (data.video_title) this.videoTitle = data.video_title;
+
+                if (data.stage === 'completed' || data.stage === 'failed') {
+                    clearInterval(this.pollTimer);
+                }
+            } catch (e) {
+                // Silently retry on next interval
+            }
+        },
+
+        currentStageIndex() {
+            return this.stageOrder.indexOf(this.stage);
+        },
+
+        isStageComplete(key) {
+            if (this.stage === 'completed') return true;
+            const current = this.currentStageIndex();
+            const target = this.stageOrder.indexOf(key);
+            return current > target;
+        },
+
+        isStageActive(key) {
+            if (this.stage === 'completed' || this.stage === 'failed') return false;
+            return this.stage === key;
+        },
+
+        isStagePending(key) {
+            return !this.isStageComplete(key) && !this.isStageActive(key);
+        },
+
+        getStageClass(key) {
+            if (this.isStageActive(key)) return 'bg-brand-500/10 border border-brand-500/20';
+            if (this.isStageComplete(key)) return 'bg-gray-800/30';
+            return 'bg-transparent';
+        },
+    };
+}
+</script>
+{% endblock %}

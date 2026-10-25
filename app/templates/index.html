@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}VidMash — Watch Less. Know More.{% endblock %}
+
+{% block content %}
+<!-- ===== HERO SECTION ===== -->
+<section class="relative overflow-hidden">
+    <!-- Background gradient mesh -->
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-gray-950 to-purple-950"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_50%)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(20,184,166,0.1),transparent_50%)]"></div>
+
+    <!-- Animated grid pattern -->
+    <div class="absolute inset-0 opacity-[0.03]"
+         style="background-image: linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32 sm:pt-32 sm:pb-40">
+        <div class="text-center max-w-4xl mx-auto fade-in-up">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-300 text-sm font-medium mb-8">
+                <span class="h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
+                7-Layer Cortex Engine &middot; AI-Powered
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6">
+                <span class="gradient-text">VidMash</span>
+            </h1>
+
+            <!-- Tagline -->
+            <p class="text-xl sm:text-2xl lg:text-3xl text-gray-300 font-light mb-4">
+                Watch Less. Know More.
+            </p>
+            <p class="text-base sm:text-lg text-gray-500 max-w-2xl mx-auto mb-4">
+                Transform any video into a comprehensive document.
+            </p>
+            <p class="text-sm sm:text-base text-gray-600 max-w-xl mx-auto mb-12">
+                Hours of video → Minutes of reading. Zero information loss.
+            </p>
+
+            <!-- URL Input Form -->
+            <div x-data="videoForm()" class="max-w-2xl mx-auto">
+                <form @submit.prevent="submitUrl" class="relative">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-brand-500 to-accent-500 rounded-2xl blur-lg opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
+                        <div class="relative flex items-center bg-gray-900/80 backdrop-blur-xl rounded-2xl border border-white/10 p-2 shadow-2xl">
+                            <!-- URL icon -->
+                            <div class="pl-4 pr-3 text-gray-500">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
+                            </div>
+                            <input
+                                type="url"
+                                x-model="url"
+                                placeholder="Paste any YouTube video URL..."
+                                class="glow-input flex-1 bg-transparent text-gray-100 placeholder-gray-600 text-base sm:text-lg py-3 px-2 focus:outline-none"
+                                :disabled="loading"
+                                required
+                            >
+                            <button
+                                type="submit"
+                                :disabled="loading || !url.trim()"
+                                class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white text-sm sm:text-base transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                                :class="loading
+                                    ? 'bg-gray-700'
+                                    : 'bg-gradient-to-r from-brand-500 to-accent-500 hover:from-brand-400 hover:to-accent-400 hover:shadow-lg hover:shadow-brand-500/25 active:scale-95'"
+                            >
+                                <template x-if="!loading">
+                                    <span class="flex items-center gap-2">
+                                        🚀 <span class="hidden sm:inline">Transform Video</span><span class="sm:hidden">Go</span>
+                                    </span>
+                                </template>
+                                <template x-if="loading">
+                                    <span class="flex items-center gap-2">
+                                        <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Processing…
+                                    </span>
+                                </template>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Error message -->
+                <div x-show="error" x-transition class="mt-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-center">
+                    <span x-text="error"></span>
+                </div>
+
+                <!-- Supported platforms hint -->
+                <p class="mt-4 text-xs text-gray-600 text-center">
+                    Supports YouTube videos up to 4 hours &middot; Public videos only
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fade to next section -->
+    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-950 to-transparent"></div>
+</section>
+
+
+<!-- ===== FEATURES SECTION ===== -->
+<section id="features" class="relative py-24 sm:py-32">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center mb-16 fade-in-up">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
+                Powered by the <span class="gradient-text">Cortex Engine</span>
+            </h2>
+            <p class="text-gray-500 max-w-2xl mx-auto">
+                Our 7-layer AI pipeline doesn't just summarize — it <em>understands</em>.
+                Every concept, every nuance, beautifully preserved.
+            </p>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            <!-- Feature 1 -->
+            <div class="group relative">
+                <div class="absolute -inset-px bg-gradient-to-b from-brand-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-2xl p-8 h-full hover:border-brand-500/30 transition-all duration-500">
+                    <div class="w-14 h-14 rounded-xl bg-brand-500/10 flex items-center justify-center text-3xl mb-6">
+                        🧠
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">7-Layer Cortex Engine</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Our unique AI pipeline analyses every frame of information — extraction,
+                        segmentation, density mapping, knowledge graphs, visual generation,
+                        narrative composition, and professional rendering.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2 -->
+            <div class="group relative">
+                <div class="absolute -inset-px bg-gradient-to-b from-accent-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-2xl p-8 h-full hover:border-accent-500/30 transition-all duration-500">
+                    <div class="w-14 h-14 rounded-xl bg-accent-500/10 flex items-center justify-center text-3xl mb-6">
+                        📊
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Auto-Generated Visuals</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Charts, mind maps, timelines, and flow diagrams — automatically
+                        generated from the video's content. Complex ideas made visual,
+                        instantly understandable.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3 -->
+            <div class="group relative">
+                <div class="absolute -inset-px bg-gradient-to-b from-purple-500/20 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-2xl p-8 h-full hover:border-purple-500/30 transition-all duration-500">
+                    <div class="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center text-3xl mb-6">
+                        📄
+                    </div>
+                    <h3 class="text-xl font-semibold text-white mb-3">Beautiful Documents</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Professional PDFs and HTML reports with zero need to watch the
+                        original video. Executive summaries, key takeaways, action items,
+                        and a glossary — all included.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ===== HOW IT WORKS ===== -->
+<section id="how-it-works" class="relative py-24 sm:py-32 overflow-hidden">
+    <!-- Subtle background -->
+    <div class="absolute inset-0 bg-gradient-to-b from-gray-950 via-brand-950/20 to-gray-950"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Section Header -->
+        <div class="text-center mb-20 fade-in-up">
+            <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
+                How It Works
+            </h2>
+            <p class="text-gray-500 max-w-lg mx-auto">
+                Three simple steps. From video URL to comprehensive report.
+            </p>
+        </div>
+
+        <!-- Steps -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            <!-- Connector line (desktop only) -->
+            <div class="hidden md:block absolute top-16 left-[20%] right-[20%] h-px bg-gradient-to-r from-brand-500/40 via-accent-500/40 to-purple-500/40"></div>
+
+            <!-- Step 1 -->
+            <div class="relative text-center fade-in-up">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-white shadow-lg shadow-brand-500/30 relative z-10">
+                    1
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">Paste URL</h3>
+                <p class="text-gray-500 text-sm">
+                    Drop any YouTube video URL into the input field above. That's it — no sign-up required.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="relative text-center fade-in-up" style="animation-delay: 150ms;">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-accent-500 to-accent-600 flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-white shadow-lg shadow-accent-500/30 relative z-10">
+                    2
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">AI Analyzes</h3>
+                <p class="text-gray-500 text-sm">
+                    The Cortex Engine processes the video through 7 intelligent layers,
+                    extracting knowledge and generating visuals.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="relative text-center fade-in-up" style="animation-delay: 300ms;">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mx-auto mb-6 text-2xl font-bold text-white shadow-lg shadow-purple-500/30 relative z-10">
+                    3
+                </div>
+                <h3 class="text-lg font-semibold text-white mb-2">Get Report</h3>
+                <p class="text-gray-500 text-sm">
+                    Download a beautiful PDF or browse the interactive HTML report.
+                    All the knowledge, none of the watch time.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ===== CTA SECTION ===== -->
+<section class="relative py-24">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="relative">
+            <div class="absolute -inset-4 bg-gradient-to-r from-brand-500/10 via-accent-500/10 to-purple-500/10 rounded-3xl blur-3xl"></div>
+            <div class="relative bg-gray-900/50 backdrop-blur border border-white/5 rounded-3xl p-12 sm:p-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
+                    Ready to transform a video?
+                </h2>
+                <p class="text-gray-400 mb-8 max-w-lg mx-auto">
+                    Paste a URL above and let the Cortex Engine do the rest.
+                    Your comprehensive report will be ready in minutes.
+                </p>
+                <a href="#"
+                   onclick="document.querySelector('input[type=url]').focus(); window.scrollTo({top: 0, behavior: 'smooth'}); return false;"
+                   class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-white font-semibold hover:from-brand-400 hover:to-accent-400 transition-all duration-300 hover:shadow-lg hover:shadow-brand-500/25 active:scale-95">
+                    🚀 Get Started — It's Free
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function videoForm() {
+    return {
+        url: '',
+        loading: false,
+        error: '',
+
+        async submitUrl() {
+            if (!this.url.trim()) return;
+            this.loading = true;
+            this.error = '';
+
+            try {
+                const response = await fetch('/api/process', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: this.url.trim() }),
+                });
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.detail || `Request failed (${response.status})`);
+                }
+
+                const data = await response.json();
+                window.location.href = data.redirect;
+
+            } catch (err) {
+                this.error = err.message || 'An unexpected error occurred. Please try again.';
+                this.loading = false;
+            }
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+/* VidMash Custom Stylesheet */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --brand-primary: #6366f1;
+    --brand-primary-dark: #4f46e5;
+    --brand-secondary: #14b8a6;
+    --brand-accent: #f59e0b;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+code, pre, .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Gradient text utility */
+.gradient-text {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #14b8a6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.gradient-border {
+    position: relative;
+    background: linear-gradient(60deg, #6366f1, #14b8a6, #a855f7);
+    padding: 2px;
+    border-radius: 1rem;
+}
+
+/* Glowing input effects */
+.glow-input {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glow-input:focus {
+    box-shadow: 0 0 35px -5px rgba(99, 102, 241, 0.4), 0 0 10px rgba(20, 184, 166, 0.2);
+    border-color: rgba(99, 102, 241, 0.8);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Pulse animation for running pipeline steps */
+@keyframes soft-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.85;
+        transform: scale(1.02);
+    }
+}
+
+.animate-soft-pulse {
+    animation: soft-pulse 2s infinite ease-in-out;
+}
+
+/* Print styling */
+@media print {
+    header, footer, aside, .no-print {
+        display: none !important;
+    }
+    main {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
