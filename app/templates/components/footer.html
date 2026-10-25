@@ -1,49 +1,60 @@
-<!-- VidMash Footer Component -->
-<footer class="border-t border-white/5 bg-gray-950">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Brand -->
-            <div>
-                <div class="flex items-center gap-3 mb-4">
-                    <img src="/static/img/logo.svg" alt="VidMash" class="h-8 w-8">
-                    <span class="text-lg font-bold gradient-text">VidMash</span>
+<!-- Apple Minimalist Footer -->
+<footer class="border-t border-white/[0.08] bg-black text-apple-textSecondary text-xs">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <!-- Col 1 -->
+            <div class="space-y-3 md:col-span-1">
+                <div class="flex items-center gap-2">
+                    <div class="w-5 h-5 rounded bg-white text-black font-bold text-[10px] flex items-center justify-center">VM</div>
+                    <span class="text-white font-semibold text-sm">VidMash</span>
                 </div>
-                <p class="text-sm text-gray-500 max-w-xs">
-                    Transform any video into a comprehensive, beautifully formatted document.
-                    Watch Less. Know More.
+                <p class="text-apple-textTertiary text-xs leading-relaxed">
+                    Zero-loss video intelligence. Deconstructing video streams into academic research dossiers.
                 </p>
+                <div class="text-[11px] font-mono text-apple-textTertiary">
+                    100% Free & Open Architecture
+                </div>
             </div>
 
-            <!-- Links -->
+            <!-- Col 2 -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Product</h3>
-                <ul class="space-y-3">
-                    <li><a href="/#features" class="text-sm text-gray-500 hover:text-brand-400 transition-colors">Features</a></li>
-                    <li><a href="/#how-it-works" class="text-sm text-gray-500 hover:text-brand-400 transition-colors">How It Works</a></li>
-                    <li><a href="https://github.com" target="_blank" rel="noopener" class="text-sm text-gray-500 hover:text-brand-400 transition-colors">GitHub</a></li>
+                <h5 class="text-apple-textPrimary font-semibold mb-3">Architecture</h5>
+                <ul class="space-y-2 text-apple-textSecondary">
+                    <li><a href="#architecture" class="hover:text-white transition">Acoustic Ingestion</a></li>
+                    <li><a href="#architecture" class="hover:text-white transition">Manifold Clustering</a></li>
+                    <li><a href="#architecture" class="hover:text-white transition">Information Density (IDS)</a></li>
+                    <li><a href="#architecture" class="hover:text-white transition">Knowledge Topology</a></li>
                 </ul>
             </div>
 
-            <!-- Resources -->
+            <!-- Col 3 -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Resources</h3>
-                <ul class="space-y-3">
-                    <li><a href="#" class="text-sm text-gray-500 hover:text-brand-400 transition-colors">Documentation</a></li>
-                    <li><a href="#" class="text-sm text-gray-500 hover:text-brand-400 transition-colors">API Reference</a></li>
-                    <li><a href="#" class="text-sm text-gray-500 hover:text-brand-400 transition-colors">About</a></li>
+                <h5 class="text-apple-textPrimary font-semibold mb-3">Exports</h5>
+                <ul class="space-y-2 text-apple-textSecondary">
+                    <li><a href="#sample-dossier" class="hover:text-white transition">Research Paper PDF</a></li>
+                    <li><a href="#sample-dossier" class="hover:text-white transition">Obsidian & Notion MD</a></li>
+                    <li><a href="#sample-dossier" class="hover:text-white transition">Structured Knowledge JSON</a></li>
+                    <li><a href="#sample-dossier" class="hover:text-white transition">Interactive AI Copilot</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 4 -->
+            <div>
+                <h5 class="text-apple-textPrimary font-semibold mb-3">Deployment</h5>
+                <ul class="space-y-2 text-apple-textSecondary">
+                    <li><a href="#zero-dollar" class="hover:text-white transition">Cloudflare Tunnel ($0)</a></li>
+                    <li><a href="#zero-dollar" class="hover:text-white transition">Docker Deployment</a></li>
+                    <li><a href="https://github.com/wealthninja77-dotcom/vidmash" target="_blank" class="hover:text-white transition">Source Code</a></li>
                 </ul>
             </div>
         </div>
 
-        <div class="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-sm text-gray-600">
-                Built with ❤️ by VidMash &middot; &copy; {{ now().year if now is defined else "2026" }}
-            </p>
-            <div class="flex items-center gap-4">
-                <span class="text-xs text-gray-700 font-mono">v1.0.0</span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-500/10 text-accent-400 text-xs font-medium">
-                    <span class="h-1.5 w-1.5 rounded-full bg-accent-400 animate-pulse"></span>
-                    Online
+        <div class="pt-6 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-apple-textTertiary">
+            <p>&copy; 2026 VidMash. Built with precision for deep research.</p>
+            <div class="flex items-center gap-4 font-mono text-[11px]">
+                <span class="inline-flex items-center gap-1.5 text-apple-emerald">
+                    <span class="h-1.5 w-1.5 rounded-full bg-apple-emerald animate-pulse"></span>
+                    Local Neural Inference Active
                 </span>
             </div>
         </div>

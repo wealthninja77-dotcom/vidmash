@@ -71,12 +71,74 @@ jobs: dict[str, ProcessingStatus] = {}
 # Application lifespan
 # ---------------------------------------------------------------------------
 
+def load_existing_jobs() -> None:
+    """Scan OUTPUT_DIR and load all completed reports into the in-memory jobs cache."""
+    settings = get_settings()
+    out_dir = Path(settings.OUTPUT_DIR)
+    if not out_dir.exists():
+        return
+    for item in out_dir.iterdir():
+        if item.is_dir():
+            report_json = item / "report.json"
+            if report_json.exists():
+                try:
+                    with open(report_json, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    meta = data.get("metadata", {})
+                    job_id = item.name
+                    pdf_file = item / "report.pdf"
+                    html_file = item / "report.html"
+                    jobs[job_id] = ProcessingStatus(
+                        job_id=job_id,
+                        video_url=f"https://www.youtube.com/watch?v={meta.get('video_id', '')}" if meta.get('video_id') else "",
+                        video_title=meta.get("title", "Research Dossier"),
+                        stage=ProcessingStage.COMPLETED,
+                        progress=100,
+                        message="Processing complete",
+                        pdf_path=str(pdf_file) if pdf_file.exists() else "",
+                        html_path=str(html_file) if html_file.exists() else "",
+                    )
+                except Exception as exc:
+                    logger.debug("Could not index existing job %s: %s", item.name, exc)
+
+
+def _resolve_job(identifier: str) -> tuple[str, Path] | None:
+    """Resolve identifier (either job_id or video_id) to (real_job_id, job_dir)."""
+    settings = get_settings()
+    out_dir = Path(settings.OUTPUT_DIR)
+
+    # 1. Direct match on directory name (job_id)
+    direct = out_dir / identifier
+    if direct.is_dir() and (direct / "report.json").exists():
+        return identifier, direct
+
+    # 2. Check in-memory jobs
+    if identifier in jobs:
+        d = out_dir / identifier
+        if d.is_dir():
+            return identifier, d
+
+    # 3. Match against video_id in all report.json files
+    if out_dir.exists():
+        for d in out_dir.iterdir():
+            if d.is_dir() and (d / "report.json").exists():
+                try:
+                    with open(d / "report.json", "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    if data.get("metadata", {}).get("video_id") == identifier:
+                        return d.name, d
+                except Exception:
+                    continue
+    return None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Startup / shutdown hook — ensure output directory exists."""
+    """Startup / shutdown hook — ensure output directory exists and index past dossiers."""
     settings = get_settings()
     os.makedirs(settings.OUTPUT_DIR, exist_ok=True)
-    logger.info("VidMash started — output dir: %s", settings.OUTPUT_DIR)
+    load_existing_jobs()
+    logger.info("VidMash started — loaded %d historical dossiers", len(jobs))
     yield
     logger.info("VidMash shutting down")
 
@@ -191,28 +253,103 @@ async def processing_page(request: Request, job_id: str) -> HTMLResponse:
 
 @app.get("/report/{job_id}", response_class=HTMLResponse)
 async def report_page(request: Request, job_id: str) -> HTMLResponse:
-    """Serve the generated inline HTML report."""
-    if job_id not in jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
-    status = jobs[job_id]
-    if status.stage != ProcessingStage.COMPLETED or not status.html_path:
-        raise HTTPException(status_code=400, detail="Report not ready yet")
+    """Serve the generated inline HTML report with dynamic template rendering fallback."""
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Dossier not found")
 
-    html_path = Path(status.html_path)
-    if not html_path.exists():
-        raise HTTPException(status_code=404, detail="HTML report file not found")
+    real_job_id, job_dir = resolved
+    html_file = job_dir / "report.html"
+    report_json = job_dir / "report.json"
 
-    return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
+    if html_file.exists():
+        return HTMLResponse(content=html_file.read_text(encoding="utf-8"))
+
+    if report_json.exists():
+        try:
+            with open(report_json, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            from app.models.schemas import DocumentReport
+            rep = DocumentReport.model_validate(data)
+            return templates.TemplateResponse(
+                "report.html",
+                {
+                    "request": request,
+                    "report": rep,
+                    "job_id": real_job_id,
+                    "now": datetime.now(),
+                },
+            )
+        except Exception as exc:
+            logger.error("Failed to dynamically render report: %s", exc)
+
+    raise HTTPException(status_code=404, detail="Report file not found")
 
 
 @app.get("/report/{job_id}/{filename}")
 async def report_asset(job_id: str, filename: str) -> FileResponse:
     """Serve visual assets (PNG charts/diagrams) referenced by the HTML report."""
-    settings = get_settings()
-    file_path = Path(settings.OUTPUT_DIR) / job_id / filename
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    real_job_id, job_dir = resolved
+    clean_filename = Path(filename).name
+    file_path = job_dir / clean_filename
     if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="Asset not found")
+        raise HTTPException(status_code=404, detail=f"Asset {clean_filename} not found")
     return FileResponse(path=str(file_path))
+
+
+@app.get("/api/library")
+async def get_library() -> JSONResponse:
+    """Return all completed research dossiers in the local workspace archive."""
+    settings = get_settings()
+    out_dir = Path(settings.OUTPUT_DIR)
+    items = []
+
+    if out_dir.exists():
+        subdirs = sorted(
+            [d for d in out_dir.iterdir() if d.is_dir() and (d / "report.json").exists()],
+            key=lambda d: d.stat().st_mtime,
+            reverse=True,
+        )
+
+        for d in subdirs:
+            try:
+                with open(d / "report.json", "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                meta = data.get("metadata", {})
+                sec_count = len(data.get("sections", []))
+                vis_count = len(data.get("visuals", []))
+                takeaway_count = len(data.get("key_takeaways", []))
+                dur = meta.get("duration", 0)
+                mins = dur // 60
+                secs = dur % 60
+                dur_fmt = f"{mins}m {secs:02d}s" if mins > 0 else f"{secs}s"
+                read_mins = max(1, round(dur / 180))
+
+                items.append({
+                    "job_id": d.name,
+                    "video_id": meta.get("video_id", ""),
+                    "title": meta.get("title", "Untitled Research Dossier"),
+                    "channel": meta.get("channel", "Unknown Channel"),
+                    "duration": dur,
+                    "duration_formatted": dur_fmt,
+                    "read_time": f"{read_mins} min read",
+                    "thumbnail_url": meta.get("thumbnail_url", ""),
+                    "upload_date": meta.get("upload_date", ""),
+                    "sections_count": sec_count,
+                    "figures_count": vis_count,
+                    "takeaways_count": takeaway_count,
+                    "compression_ratio": data.get("compression_ratio", "85% compression"),
+                    "pdf_available": (d / "report.pdf").exists(),
+                    "created_at": datetime.fromtimestamp(d.stat().st_mtime).strftime("%b %d, %Y"),
+                })
+            except Exception:
+                continue
+
+    return JSONResponse(content={"dossiers": items, "count": len(items)})
 
 
 # ---------------------------------------------------------------------------
@@ -273,35 +410,39 @@ async def get_status(job_id: str) -> JSONResponse:
 
 @app.get("/api/download/pdf/{job_id}")
 async def download_pdf(job_id: str) -> FileResponse:
-    """Download the generated PDF report."""
-    if job_id not in jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
+    """Download the generated publication-quality PDF report."""
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Dossier not found")
 
-    status = jobs[job_id]
-    if not status.pdf_path or not Path(status.pdf_path).exists():
+    real_job_id, job_dir = resolved
+    pdf_path = job_dir / "report.pdf"
+    if not pdf_path.exists():
         raise HTTPException(status_code=404, detail="PDF file not found")
 
     return FileResponse(
-        path=status.pdf_path,
+        path=str(pdf_path),
         media_type="application/pdf",
-        filename=f"vidmash_report_{job_id}.pdf",
+        filename=f"vidmash_whitepaper_{real_job_id}.pdf",
     )
 
 
 @app.get("/api/download/html/{job_id}")
 async def download_html(job_id: str) -> FileResponse:
     """Download the generated HTML report."""
-    if job_id not in jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Dossier not found")
 
-    status = jobs[job_id]
-    if not status.html_path or not Path(status.html_path).exists():
+    real_job_id, job_dir = resolved
+    html_path = job_dir / "report.html"
+    if not html_path.exists():
         raise HTTPException(status_code=404, detail="HTML file not found")
 
     return FileResponse(
-        path=status.html_path,
+        path=str(html_path),
         media_type="text/html",
-        filename=f"vidmash_report_{job_id}.html",
+        filename=f"vidmash_dossier_{real_job_id}.html",
     )
 
 
@@ -315,8 +456,11 @@ class ChatQuery(PyBaseModel):
 @app.post("/api/chat/{job_id}")
 async def chat_with_video(job_id: str, payload: ChatQuery) -> JSONResponse:
     """Live interactive AI Copilot Q&A grounded in the video's intelligence dossier."""
-    settings = get_settings()
-    output_dir = Path(settings.OUTPUT_DIR) / job_id
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Job not found or report not ready")
+
+    real_job_id, output_dir = resolved
     report_json_path = output_dir / "report.json"
 
     query = payload.message.strip()
@@ -410,26 +554,34 @@ async def chat_with_video(job_id: str, payload: ChatQuery) -> JSONResponse:
 @app.get("/api/download/markdown/{job_id}")
 async def download_markdown(job_id: str) -> FileResponse:
     """Download the generated Markdown Research Dossier."""
-    settings = get_settings()
-    file_path = Path(settings.OUTPUT_DIR) / job_id / "report.md"
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Dossier not found")
+
+    real_job_id, job_dir = resolved
+    file_path = job_dir / "report.md"
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Markdown report not found")
     return FileResponse(
         path=str(file_path),
         media_type="text/markdown",
-        filename=f"vidmash_dossier_{job_id}.md",
+        filename=f"vidmash_dossier_{real_job_id}.md",
     )
 
 
 @app.get("/api/download/json/{job_id}")
 async def download_json(job_id: str) -> FileResponse:
     """Download the raw structured JSON knowledge dataset."""
-    settings = get_settings()
-    file_path = Path(settings.OUTPUT_DIR) / job_id / "report.json"
+    resolved = _resolve_job(job_id)
+    if not resolved:
+        raise HTTPException(status_code=404, detail="Dossier not found")
+
+    real_job_id, job_dir = resolved
+    file_path = job_dir / "report.json"
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="JSON report not found")
     return FileResponse(
         path=str(file_path),
         media_type="application/json",
-        filename=f"vidmash_data_{job_id}.json",
+        filename=f"vidmash_data_{real_job_id}.json",
     )

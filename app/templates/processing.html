@@ -1,174 +1,127 @@
 {% extends "base.html" %}
 
-{% block title %}Synthesizing Dossier — VidMash Autonomous Cortex{% endblock %}
+{% block title %}Synthesizing Research Dossier — VidMash{% endblock %}
 
 {% block content %}
-<section class="relative min-h-[85vh] flex items-center justify-center py-16"
+<section class="min-h-[82vh] flex items-center justify-center py-16"
          x-data="processingStatus('{{ job_id }}')">
 
-    <!-- Ambient Lighting & Precision Grid -->
-    <div class="absolute inset-0 bg-zinc-950 pointer-events-none"></div>
-    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] bg-brand-600/10 blur-[120px] rounded-full pointer-events-none"></div>
-    <div class="absolute inset-0 opacity-[0.03] pointer-events-none"
-         style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 40px 40px;"></div>
-
-    <div class="relative w-full max-w-3xl mx-auto px-4 sm:px-6">
+    <div class="w-full max-w-2xl mx-auto px-4 sm:px-6">
         
-        <!-- Main Swarm Control Card -->
-        <div class="bg-zinc-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-brand-500/10 to-teal-500/10 blur-2xl pointer-events-none"></div>
-
-            <!-- Top Header Badge -->
+        <!-- Apple Card Surface -->
+        <div class="bg-apple-card border border-apple-border rounded-3xl p-7 sm:p-10 shadow-2xl relative">
+            
+            <!-- Header Status Pill -->
             <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono text-zinc-300 mb-3">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-[11px] font-mono text-zinc-400 mb-4">
                     <span class="h-1.5 w-1.5 rounded-full"
-                          :class="stage === 'completed' ? 'bg-emerald-400' : stage === 'failed' ? 'bg-red-400' : 'bg-brand-400 animate-pulse'"></span>
-                    <span x-text="stage === 'completed' ? 'SYNTHESIS COMPLETE' : stage === 'failed' ? 'EXECUTION HALTED' : 'AUTONOMOUS SWARM ENGAGED'"></span>
+                          :class="stage === 'completed' ? 'bg-apple-emerald' : stage === 'failed' ? 'bg-red-400' : 'bg-apple-blue animate-pulse'"></span>
+                    <span x-text="stage === 'completed' ? 'SYNTHESIS COMPLETE' : stage === 'failed' ? 'SYNTHESIS HALTED' : 'DECONSTRUCTING VIDEO STREAM'"></span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-2 tracking-tight" x-text="videoTitle || 'Deconstructing Video Stream...'">
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2" x-text="videoTitle || 'Processing Video Stream...'">
                     {{ video_title }}
                 </h1>
                 <p class="text-xs text-zinc-500 font-mono truncate max-w-md mx-auto">{{ url }}</p>
             </div>
 
-            <!-- Precision Progress Bar -->
+            <!-- Apple-Style Smooth Progress Bar -->
             <div class="mb-8">
-                <div class="flex items-center justify-between mb-2">
-                    <div class="flex items-center gap-2">
-                        <svg class="animate-spin h-3.5 w-3.5 text-brand-400" x-show="stage !== 'completed' && stage !== 'failed'" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span class="text-xs sm:text-sm text-zinc-300 font-medium" x-text="message">Initializing Cortex Engine…</span>
-                    </div>
-                    <span class="text-sm font-mono font-bold text-brand-300" x-text="progress + '%'">0%</span>
+                <div class="flex items-center justify-between mb-2.5">
+                    <span class="text-xs text-zinc-400 font-medium font-sans" x-text="message">Initializing Cortex Engine…</span>
+                    <span class="text-xs font-mono font-semibold text-white" x-text="progress + '%'">0%</span>
                 </div>
-                <div class="w-full h-2 bg-zinc-800/80 rounded-full overflow-hidden p-0.5 border border-white/5">
-                    <div class="h-full rounded-full transition-all duration-500 ease-out"
-                         :class="stage === 'failed' ? 'bg-red-500' : 'bg-gradient-to-r from-brand-500 via-indigo-400 to-teal-400'"
+                <div class="w-full h-1.5 bg-[#1C1C1E] rounded-full overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-300 ease-out"
+                         :class="stage === 'failed' ? 'bg-red-500' : 'bg-white'"
                          :style="'width: ' + progress + '%'">
                     </div>
                 </div>
             </div>
 
-            <!-- Autonomous Agent Swarm Grid -->
-            <div class="space-y-2.5 mb-8">
-                <div class="text-xs font-mono uppercase tracking-wider text-zinc-500 mb-2">Active Cognitive Agents</div>
-
-                <!-- Agent 1: Sonic Ingestion -->
-                <div class="flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-300"
-                     :class="progress >= 15 ? 'bg-zinc-950/60 border-emerald-500/20' : progress >= 5 ? 'bg-brand-950/30 border-brand-500/40 shadow-lg shadow-brand-500/10' : 'bg-zinc-950/20 border-white/5 opacity-50'">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg">🛰️</span>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Agent 01: Sonic Ingestion & Tokenizer</div>
-                            <div class="text-[11px] text-zinc-400">Audio stream demuxing & neural acoustic transcription</div>
-                        </div>
+            <!-- Minimalist Step List -->
+            <div class="space-y-2 mb-8 divide-y divide-white/[0.04]">
+                <!-- Step 1: Acoustic Ingestion -->
+                <div class="pt-2.5 flex items-center justify-between text-xs font-sans">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              :class="progress >= 15 ? 'bg-apple-emerald' : progress >= 5 ? 'bg-apple-blue animate-pulse' : 'bg-zinc-700'"></span>
+                        <span :class="progress >= 5 ? 'text-zinc-200' : 'text-zinc-500'">Acoustic Ingestion & Tokenizer (faster-whisper)</span>
                     </div>
-                    <div>
-                        <span x-show="progress >= 15" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VERIFIED</span>
-                        <span x-show="progress >= 5 && progress < 15" class="px-2 py-0.5 rounded text-[10px] font-mono bg-brand-500/10 text-brand-300 border border-brand-500/20 animate-pulse">EXECUTING</span>
-                        <span x-show="progress < 5" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-500">QUEUED</span>
-                    </div>
+                    <span class="font-mono text-[11px]" :class="progress >= 15 ? 'text-apple-emerald' : 'text-zinc-600'"
+                          x-text="progress >= 15 ? 'Done' : progress >= 5 ? 'Active' : 'Pending'"></span>
                 </div>
 
-                <!-- Agent 2: Semantic Topographer -->
-                <div class="flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-300"
-                     :class="progress >= 25 ? 'bg-zinc-950/60 border-emerald-500/20' : progress >= 15 ? 'bg-brand-950/30 border-brand-500/40 shadow-lg shadow-brand-500/10' : 'bg-zinc-950/20 border-white/5 opacity-50'">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg">📐</span>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Agent 02: Semantic Topographer</div>
-                            <div class="text-[11px] text-zinc-400">Cosine boundary clustering & topic manifold mapping</div>
-                        </div>
+                <!-- Step 2: Semantic Manifold -->
+                <div class="pt-2.5 flex items-center justify-between text-xs font-sans">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              :class="progress >= 25 ? 'bg-apple-emerald' : progress >= 15 ? 'bg-apple-blue animate-pulse' : 'bg-zinc-700'"></span>
+                        <span :class="progress >= 15 ? 'text-zinc-200' : 'text-zinc-500'">Semantic Manifold Clustering (Cosine Boundaries)</span>
                     </div>
-                    <div>
-                        <span x-show="progress >= 25" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VERIFIED</span>
-                        <span x-show="progress >= 15 && progress < 25" class="px-2 py-0.5 rounded text-[10px] font-mono bg-brand-500/10 text-brand-300 border border-brand-500/20 animate-pulse">EXECUTING</span>
-                        <span x-show="progress < 15" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-500">QUEUED</span>
-                    </div>
+                    <span class="font-mono text-[11px]" :class="progress >= 25 ? 'text-apple-emerald' : 'text-zinc-600'"
+                          x-text="progress >= 25 ? 'Done' : progress >= 15 ? 'Active' : 'Pending'"></span>
                 </div>
 
-                <!-- Agent 3: Density & Entropy Auditor -->
-                <div class="flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-300"
-                     :class="progress >= 40 ? 'bg-zinc-950/60 border-emerald-500/20' : progress >= 25 ? 'bg-brand-950/30 border-brand-500/40 shadow-lg shadow-brand-500/10' : 'bg-zinc-950/20 border-white/5 opacity-50'">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg">📊</span>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Agent 03: Density & Entropy Auditor</div>
-                            <div class="text-[11px] text-zinc-400">Mathematical Information Density Score (IDS) filtering</div>
-                        </div>
+                <!-- Step 3: Information Density -->
+                <div class="pt-2.5 flex items-center justify-between text-xs font-sans">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              :class="progress >= 40 ? 'bg-apple-emerald' : progress >= 25 ? 'bg-apple-blue animate-pulse' : 'bg-zinc-700'"></span>
+                        <span :class="progress >= 25 ? 'text-zinc-200' : 'text-zinc-500'">Information Density & Entropy Filter (IDS)</span>
                     </div>
-                    <div>
-                        <span x-show="progress >= 40" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VERIFIED</span>
-                        <span x-show="progress >= 25 && progress < 40" class="px-2 py-0.5 rounded text-[10px] font-mono bg-brand-500/10 text-brand-300 border border-brand-500/20 animate-pulse">EXECUTING</span>
-                        <span x-show="progress < 25" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-500">QUEUED</span>
-                    </div>
+                    <span class="font-mono text-[11px]" :class="progress >= 40 ? 'text-apple-emerald' : 'text-zinc-600'"
+                          x-text="progress >= 40 ? 'Done' : progress >= 25 ? 'Active' : 'Pending'"></span>
                 </div>
 
-                <!-- Agent 4: Knowledge Graph Synthesizer -->
-                <div class="flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-300"
-                     :class="progress >= 70 ? 'bg-zinc-950/60 border-emerald-500/20' : progress >= 40 ? 'bg-brand-950/30 border-brand-500/40 shadow-lg shadow-brand-500/10' : 'bg-zinc-950/20 border-white/5 opacity-50'">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg">🕸️</span>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Agent 04: Cognitive Graph & Visuals Engine</div>
-                            <div class="text-[11px] text-zinc-400">Multi-hop entity resolution & 4 high-res diagram rendering</div>
-                        </div>
+                <!-- Step 4: Knowledge Graph -->
+                <div class="pt-2.5 flex items-center justify-between text-xs font-sans">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              :class="progress >= 70 ? 'bg-apple-emerald' : progress >= 40 ? 'bg-apple-blue animate-pulse' : 'bg-zinc-700'"></span>
+                        <span :class="progress >= 40 ? 'text-zinc-200' : 'text-zinc-500'">Knowledge Graph & Diagram Generation</span>
                     </div>
-                    <div>
-                        <span x-show="progress >= 70" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VERIFIED</span>
-                        <span x-show="progress >= 40 && progress < 70" class="px-2 py-0.5 rounded text-[10px] font-mono bg-brand-500/10 text-brand-300 border border-brand-500/20 animate-pulse">EXECUTING</span>
-                        <span x-show="progress < 40" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-500">QUEUED</span>
-                    </div>
+                    <span class="font-mono text-[11px]" :class="progress >= 70 ? 'text-apple-emerald' : 'text-zinc-600'"
+                          x-text="progress >= 70 ? 'Done' : progress >= 40 ? 'Active' : 'Pending'"></span>
                 </div>
 
-                <!-- Agent 5: Academic Dossier Architect -->
-                <div class="flex items-center justify-between p-3.5 rounded-2xl border transition-all duration-300"
-                     :class="progress >= 100 ? 'bg-zinc-950/60 border-emerald-500/20' : progress >= 70 ? 'bg-brand-950/30 border-brand-500/40 shadow-lg shadow-brand-500/10' : 'bg-zinc-950/20 border-white/5 opacity-50'">
-                    <div class="flex items-center gap-3">
-                        <span class="text-lg">🔬</span>
-                        <div>
-                            <div class="text-xs font-semibold text-white">Agent 05: Academic Dossier Architect</div>
-                            <div class="text-[11px] text-zinc-400">Formal paper synthesis, ReportLab PDF & standalone dossier</div>
-                        </div>
+                <!-- Step 5: Whitepaper Compiler -->
+                <div class="pt-2.5 flex items-center justify-between text-xs font-sans">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                              :class="progress >= 100 ? 'bg-apple-emerald' : progress >= 70 ? 'bg-apple-blue animate-pulse' : 'bg-zinc-700'"></span>
+                        <span :class="progress >= 70 ? 'text-zinc-200' : 'text-zinc-500'">Research Paper & PDF Compilation</span>
                     </div>
-                    <div>
-                        <span x-show="progress >= 100" class="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VERIFIED</span>
-                        <span x-show="progress >= 70 && progress < 100" class="px-2 py-0.5 rounded text-[10px] font-mono bg-brand-500/10 text-brand-300 border border-brand-500/20 animate-pulse">EXECUTING</span>
-                        <span x-show="progress < 70" class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-500">QUEUED</span>
-                    </div>
+                    <span class="font-mono text-[11px]" :class="progress >= 100 ? 'text-apple-emerald' : 'text-zinc-600'"
+                          x-text="progress >= 100 ? 'Done' : progress >= 70 ? 'Active' : 'Pending'"></span>
                 </div>
             </div>
 
-            <!-- Completed State Actions -->
-            <div x-show="stage === 'completed'" x-transition class="space-y-4 pt-4 border-t border-white/10">
-                <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-center">
-                    <p class="text-emerald-300 font-bold text-sm">🎉 Research Dossier Successfully Compiled</p>
-                    <p class="text-emerald-400/80 text-xs mt-0.5">Zero information loss verified. All peer-reviewed sections ready.</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <!-- Completed Actions -->
+            <div x-show="stage === 'completed'" x-transition class="space-y-3 pt-6 border-t border-white/[0.08]">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     <a :href="'/report/' + jobId"
-                       class="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-gradient-to-r from-brand-600 via-indigo-600 to-teal-600 text-white font-bold text-xs sm:text-sm hover:from-brand-500 hover:to-teal-500 transition shadow-lg shadow-brand-500/20 active:scale-95">
-                        <span>📑 View Research Paper</span>
+                       class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white hover:bg-zinc-200 text-black font-semibold text-xs sm:text-sm transition active:scale-95 shadow-sm">
+                        <span>Open Research Paper</span>
                     </a>
                     <a :href="'/api/download/pdf/' + jobId"
-                       class="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-zinc-200 font-semibold text-xs sm:text-sm hover:bg-white/10 hover:text-white transition active:scale-95">
-                        <span>📕 Download PDF Paper</span>
+                       class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-zinc-200 font-medium text-xs sm:text-sm transition active:scale-95">
+                        <span>Download PDF</span>
                     </a>
                     <a :href="'/api/download/markdown/' + jobId"
-                       class="flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white/5 border border-white/10 text-zinc-200 font-semibold text-xs sm:text-sm hover:bg-white/10 hover:text-white transition active:scale-95">
-                        <span>📝 Export Markdown</span>
+                       class="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-zinc-200 font-medium text-xs sm:text-sm transition active:scale-95">
+                        <span>Export Markdown</span>
                     </a>
                 </div>
             </div>
 
-            <!-- Failed State Actions -->
-            <div x-show="stage === 'failed'" x-transition class="space-y-4 pt-4 border-t border-white/10">
-                <div class="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl">
-                    <p class="text-red-400 font-bold text-sm mb-1">❌ Pipeline Interrupted</p>
-                    <p class="text-red-400/80 text-xs" x-text="errorMsg"></p>
+            <!-- Error State -->
+            <div x-show="stage === 'failed'" x-transition class="space-y-3 pt-6 border-t border-white/[0.08]">
+                <div class="p-3.5 bg-red-950/30 border border-red-500/20 rounded-xl text-xs text-red-400">
+                    <span x-text="errorMsg"></span>
                 </div>
                 <a href="/"
-                   class="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/10 border border-white/10 text-zinc-300 font-semibold text-sm hover:bg-white/15 transition w-full">
-                    <span>🔄 Return to Command Center</span>
+                   class="block text-center px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-zinc-300 text-xs font-medium transition">
+                    Return to Home
                 </a>
             </div>
 
@@ -184,7 +137,7 @@ function processingStatus(jobId) {
         jobId: jobId,
         stage: 'queued',
         progress: 0,
-        message: 'Engaging Autonomous Swarm…',
+        message: 'Initiating neural acoustic stream…',
         errorMsg: '',
         videoTitle: '{{ video_title }}',
         pollTimer: null,
@@ -210,7 +163,7 @@ function processingStatus(jobId) {
                     clearInterval(this.pollTimer);
                 }
             } catch (e) {
-                // Silent retry on interval
+                // Retry
             }
         }
     };

@@ -562,6 +562,7 @@ class DocumentRenderer:
         from jinja2 import Environment, FileSystemLoader
 
         template_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates")
+        job_id = os.path.basename(os.path.dirname(os.path.abspath(output_path)))
         
         # Try loading template from file; fall back to embedded template
         rendered_content = ""
@@ -569,10 +570,11 @@ class DocumentRenderer:
             try:
                 env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
                 env.filters["format_seconds"] = self._format_seconds
+                env.filters["basename"] = lambda p: os.path.basename(str(p)).replace("\\", "/") if p else ""
                 template = env.get_template("report.html")
-                rendered_content = template.render(report=report, now=datetime.datetime.now())
+                rendered_content = template.render(report=report, job_id=job_id, now=datetime.datetime.now())
             except Exception as e:
-                logger.warning("Could not render via Jinja report.html template: %s. Using internal template.", e)
+                logger.error("Could not render via Jinja report.html template: %s", e, exc_info=True)
 
         if not rendered_content:
             rendered_content = self._render_embedded_html(report)

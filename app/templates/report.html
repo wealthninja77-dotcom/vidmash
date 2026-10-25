@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark">
+<html lang="en" class="scroll-smooth" :class="theme === 'dark' ? 'dark' : ''" x-data="reportApp('{{ report.metadata.video_id }}', '{{ job_id or report.metadata.video_id }}')">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ report.metadata.title }} — Autonomous Research Dossier</title>
+    <title>{{ report.metadata.title }} — Research Dossier</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,244 +13,317 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#eef2ff',
-                            100: '#e0e7ff',
-                            400: '#818cf8',
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                            900: '#312e81',
+                        apple: {
+                            black: '#000000',
+                            canvas: '#050507',
+                            card: '#0e0e11',
+                            cardHover: '#141418',
+                            border: 'rgba(255, 255, 255, 0.08)',
+                            borderLight: 'rgba(255, 255, 255, 0.14)',
+                            textPrimary: '#F5F5F7',
+                            textSecondary: '#86868B',
+                            textTertiary: '#636366',
+                            blue: '#0071E3',
+                            emerald: '#30D158',
                         },
-                        tealish: {
-                            400: '#2dd4bf',
-                            500: '#14b8a6',
-                            600: '#0d9488',
+                        paper: {
+                            bg: '#FBFBFD',
+                            card: '#FFFFFF',
+                            border: 'rgba(0, 0, 0, 0.08)',
+                            textPrimary: '#1D1D1F',
+                            textSecondary: '#6E6E73',
                         }
                     },
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-                        serif: ['Charter', 'Georgia', 'serif'],
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"SF Pro Display"', '"Inter"', 'sans-serif'],
+                        serif: ['Charter', '"New York"', '"Source Serif 4"', 'Georgia', 'serif'],
+                        mono: ['"SF Mono"', '"JetBrains Mono"', 'Menlo', 'monospace'],
                     }
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts for Editorial Serif Fallback -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #09090b; }
-        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+        * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .paper-editorial {
+            font-family: 'Source Serif 4', Charter, 'New York', Georgia, serif;
+            line-height: 1.75;
+        }
     </style>
 </head>
-<body class="bg-[#09090b] text-zinc-100 font-sans antialiased min-h-screen selection:bg-brand-500 selection:text-white"
-      x-data="reportApp('{{ report.metadata.video_id }}', '{{ job_id or report.metadata.video_id }}')">
+<body class="transition-colors duration-200"
+      :class="theme === 'dark' ? 'bg-[#000000] text-apple-textPrimary' : 'bg-paper-bg text-paper-textPrimary'">
 
-    <!-- Top Sticky Precision Header -->
-    <header class="sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <!-- Precision Sticky Top Bar -->
+    <header class="sticky top-0 z-50 transition-colors duration-200 border-b backdrop-blur-2xl"
+            :class="theme === 'dark' ? 'bg-black/75 border-white/[0.08]' : 'bg-white/75 border-black/[0.08]'">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <a href="/" class="flex items-center gap-2.5 group">
-                    <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-tealish-500 flex items-center justify-center text-white font-black text-sm shadow-md group-hover:scale-105 transition">
-                        V
-                    </div>
-                    <span class="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-zinc-200 to-brand-300 bg-clip-text text-transparent">VidMash</span>
+                <a href="/" class="flex items-center gap-2 text-xs font-semibold tracking-tight transition hover:opacity-80">
+                    <span class="w-6 h-6 rounded bg-white text-black font-bold flex items-center justify-center text-[10px]">VM</span>
+                    <span :class="theme === 'dark' ? 'text-white' : 'text-black'">VidMash Dossier</span>
                 </a>
-                <span class="text-zinc-700">/</span>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[11px] font-mono border border-emerald-500/20">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                    PEER-REVIEWED DOSSIER
+                <span class="text-zinc-600">/</span>
+                <span class="text-[11px] font-mono text-zinc-500 uppercase tracking-wide">
+                    {{ job_id or report.metadata.video_id }}
                 </span>
             </div>
 
-            <!-- Header Action Controls -->
-            <div class="flex items-center gap-2 sm:gap-3 text-xs">
+            <!-- Header Controls & Theme Toggle -->
+            <div class="flex items-center gap-2">
+                <!-- Theme Mode Toggle -->
+                <button @click="theme = theme === 'dark' ? 'light' : 'dark'"
+                        class="p-1.5 rounded-lg border text-xs transition"
+                        :class="theme === 'dark' ? 'bg-zinc-900 border-white/10 text-zinc-300 hover:text-white' : 'bg-white border-black/10 text-zinc-700 hover:text-black'"
+                        title="Toggle Light/Dark Editorial Theme">
+                    <span x-text="theme === 'dark' ? '☀️ Paper Mode' : '🌙 Dark Mode'"></span>
+                </button>
+
+                <!-- Action Buttons -->
                 <a :href="'/api/download/pdf/' + currentJobId"
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-semibold transition active:scale-95 shadow-sm shadow-brand-500/20">
-                    <span>📕</span>
-                    <span class="hidden sm:inline">Download PDF</span>
+                   class="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold hover:bg-zinc-200 transition active:scale-95 shadow-sm">
+                    PDF Paper
                 </a>
                 <a :href="'/api/download/markdown/' + currentJobId"
-                   class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 hover:bg-zinc-800 text-zinc-300 font-medium transition active:scale-95">
-                    <span>📝</span>
-                    <span class="hidden sm:inline">Export Markdown</span>
+                   class="hidden sm:inline-flex px-3 py-1.5 rounded-lg border text-xs font-medium transition active:scale-95"
+                   :class="theme === 'dark' ? 'bg-zinc-900 border-white/10 text-zinc-300 hover:text-white' : 'bg-white border-black/10 text-zinc-700 hover:text-black'">
+                    Markdown
                 </a>
-                <button onclick="window.print()" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-white/10 hover:bg-zinc-800 text-zinc-400 font-medium transition">
-                    <span>🖨️</span> Print
-                </button>
             </div>
         </div>
     </header>
 
 
-    <!-- Main Document Canvas -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <!-- Main Research Paper Container -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
 
-        <!-- Research Paper Document Cover Header -->
-        <div class="relative overflow-hidden rounded-3xl bg-zinc-900/60 border border-white/10 p-6 sm:p-12 mb-10 shadow-2xl backdrop-blur-xl">
-            <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500/10 blur-[100px] pointer-events-none"></div>
-
-            <div class="relative z-10">
-                <!-- Academic Metadata Strip -->
-                <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-zinc-400 pb-4 mb-4 border-b border-white/10">
-                    <div class="flex items-center gap-2">
-                        <span class="text-brand-400 font-bold">DOC ID:</span>
-                        <span class="text-zinc-200">{{ job_id or report.metadata.video_id }}</span>
-                        <span class="text-zinc-600">•</span>
-                        <span class="text-zinc-400">CLASSIFICATION: PUBLIC TECHNICAL BRIEF</span>
-                    </div>
-                    <div>
-                        <span class="text-zinc-500">SPEED FACTOR:</span>
-                        <span class="text-teal-400 font-bold ml-1">{{ report.compression_ratio or '10x Speed-Read' }}</span>
-                    </div>
+        <!-- Research Paper Document Header -->
+        <div class="mb-12 pb-8 border-b"
+             :class="theme === 'dark' ? 'border-white/[0.08]' : 'border-black/[0.08]'">
+            
+            <!-- Metadata Top Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono mb-4 text-zinc-500">
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold" :class="theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'">AUTONOMOUS RESEARCH DOSSIER</span>
+                    <span>•</span>
+                    <span>REF: {{ job_id or report.metadata.video_id }}</span>
                 </div>
-
-                <!-- Paper Title -->
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight mb-4">
-                    {{ report.metadata.title }}
-                </h1>
-
-                <!-- Authorship & Empirical Credentials -->
-                <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs sm:text-sm text-zinc-400 pt-2">
-                    <div>
-                        <span class="text-zinc-500 font-mono">PRIMARY CREATOR:</span>
-                        <strong class="text-zinc-200 ml-1.5">{{ report.metadata.channel or 'Unknown Channel' }}</strong>
-                    </div>
-                    <div>
-                        <span class="text-zinc-500 font-mono">RECORDED DURATION:</span>
-                        <strong class="text-zinc-200 ml-1.5">
-                            {{ (report.metadata.duration // 60) }}m {{ (report.metadata.duration % 60) }}s
-                        </strong>
-                    </div>
-                    <div>
-                        <span class="text-zinc-500 font-mono">SECTIONS:</span>
-                        <strong class="text-zinc-200 ml-1.5">{{ report.sections|length }}</strong>
-                    </div>
-                    <div>
-                        <span class="text-zinc-500 font-mono">SYNTHESIS ENGINE:</span>
-                        <strong class="text-brand-300 ml-1.5">VidMash Cortex v2.0</strong>
-                    </div>
+                <div>
+                    <span>COMPRESSION:</span>
+                    <strong class="font-semibold text-apple-emerald ml-1">{{ report.compression_ratio or '10x Speed-Read' }}</strong>
                 </div>
+            </div>
+
+            <!-- Paper Title -->
+            <h1 class="text-3xl sm:text-5xl font-bold tracking-tight mb-5 leading-tight"
+                :class="theme === 'dark' ? 'text-white' : 'text-zinc-950'">
+                {{ report.metadata.title }}
+            </h1>
+
+            <!-- Author & Corpus Credentials -->
+            <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-xs text-zinc-500 font-sans">
+                <div>
+                    <span class="font-mono text-zinc-500 uppercase">Speaker / Channel:</span>
+                    <strong class="ml-1.5" :class="theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'">{{ report.metadata.channel or 'Unknown Channel' }}</strong>
+                </div>
+                <div>
+                    <span class="font-mono text-zinc-500 uppercase">Duration:</span>
+                    <strong class="ml-1.5" :class="theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'">
+                        {{ (report.metadata.duration // 60) }}m {{ (report.metadata.duration % 60) }}s
+                    </strong>
+                </div>
+                <div>
+                    <span class="font-mono text-zinc-500 uppercase">Synthesis Engine:</span>
+                    <strong class="ml-1.5" :class="theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'">VidMash Cortex v2.0</strong>
+                </div>
+                {% if report.metadata.video_id %}
+                <div>
+                    <a href="https://youtu.be/{{ report.metadata.video_id }}" target="_blank" rel="noopener"
+                       class="text-apple-blue hover:underline inline-flex items-center gap-1 font-mono">
+                        <span>Original Video ↗</span>
+                    </a>
+                </div>
+                {% endif %}
             </div>
         </div>
 
 
-        <!-- Interactive Tabbed Switcher Bar -->
-        <div class="flex items-center gap-2 border-b border-white/10 pb-4 mb-8 overflow-x-auto">
+        <!-- Apple Segmented Navigation Switcher -->
+        <div class="p-1 rounded-xl mb-10 flex items-center gap-1 overflow-x-auto border"
+             :class="theme === 'dark' ? 'bg-[#121214] border-white/[0.08]' : 'bg-[#EAEAEA] border-black/[0.06]'">
+            
             <button
                 @click="activeTab = 'paper'"
-                class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 flex-shrink-0"
-                :class="activeTab === 'paper' ? 'bg-white/10 text-white border border-white/15' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
-                <span>📑</span> Research Paper
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0"
+                :class="activeTab === 'paper'
+                    ? (theme === 'dark' ? 'bg-[#27272A] text-white shadow-sm' : 'bg-white text-black shadow-sm')
+                    : 'text-zinc-500 hover:text-zinc-300'">
+                White Paper
             </button>
 
             <button
                 @click="activeTab = 'copilot'"
-                class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 flex-shrink-0 relative"
-                :class="activeTab === 'copilot' ? 'bg-brand-500/20 text-brand-300 border border-brand-500/30' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
-                <span>💬</span> Live AI Copilot
-                <span class="h-2 w-2 rounded-full bg-brand-400 animate-pulse"></span>
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0 flex items-center gap-1.5"
+                :class="activeTab === 'copilot'
+                    ? (theme === 'dark' ? 'bg-[#27272A] text-white shadow-sm' : 'bg-white text-black shadow-sm')
+                    : 'text-zinc-500 hover:text-zinc-300'">
+                <span>Copilot Q&A</span>
+                <span class="h-1.5 w-1.5 rounded-full bg-apple-emerald animate-pulse"></span>
             </button>
 
             <button
-                @click="activeTab = 'visuals'"
-                class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 flex-shrink-0"
-                :class="activeTab === 'visuals' ? 'bg-white/10 text-white border border-white/15' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
-                <span>📈</span> Empirical Visuals ({{ report.visuals|length }})
+                @click="activeTab = 'figures'"
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0"
+                :class="activeTab === 'figures'
+                    ? (theme === 'dark' ? 'bg-[#27272A] text-white shadow-sm' : 'bg-white text-black shadow-sm')
+                    : 'text-zinc-500 hover:text-zinc-300'">
+                Figures ({{ report.visuals|length }})
             </button>
 
             <button
                 @click="activeTab = 'knowledge'"
-                class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 flex-shrink-0"
-                :class="activeTab === 'knowledge' ? 'bg-white/10 text-white border border-white/15' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
-                <span>🕸️</span> Knowledge Graph
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0"
+                :class="activeTab === 'knowledge'
+                    ? (theme === 'dark' ? 'bg-[#27272A] text-white shadow-sm' : 'bg-white text-black shadow-sm')
+                    : 'text-zinc-500 hover:text-zinc-300'">
+                Knowledge Graph
             </button>
 
             <button
                 @click="activeTab = 'actions'"
-                class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-2 flex-shrink-0"
-                :class="activeTab === 'actions' ? 'bg-white/10 text-white border border-white/15' : 'text-zinc-400 hover:text-white hover:bg-white/5'">
-                <span>🎯</span> Action Matrix ({{ report.action_items|length }})
+                class="px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-150 flex-shrink-0"
+                :class="activeTab === 'actions'
+                    ? (theme === 'dark' ? 'bg-[#27272A] text-white shadow-sm' : 'bg-white text-black shadow-sm')
+                    : 'text-zinc-500 hover:text-zinc-300'">
+                Action Matrix ({{ report.action_items|length }})
             </button>
         </div>
 
 
         <!-- ============================================================= -->
-        <!-- TAB 1: ACADEMIC RESEARCH PAPER VIEW -->
+        <!-- TAB 1: FORMAL WHITE PAPER VIEW -->
         <!-- ============================================================= -->
-        <div x-show="activeTab === 'paper'" x-transition class="space-y-10">
-
+        <div x-show="activeTab === 'paper'" x-transition class="space-y-12">
+            
             <!-- Abstract -->
             {% if report.executive_summary %}
-            <section class="bg-zinc-900/40 rounded-3xl p-6 sm:p-10 border border-white/10 relative overflow-hidden backdrop-blur-xl">
-                <div class="flex items-center gap-2 mb-4">
-                    <span class="px-2.5 py-0.5 rounded-full bg-brand-500/10 text-brand-300 font-mono text-xs font-semibold border border-brand-500/20">ABSTRACT & SYNTHESIS</span>
-                </div>
-                <div class="prose prose-invert max-w-none text-zinc-300 leading-relaxed space-y-4 text-sm sm:text-base font-normal">
-                    {% for paragraph in report.executive_summary.split('\n\n') %}
-                        {% if paragraph.strip() %}
-                            <p>{{ paragraph.strip() }}</p>
+            <section class="p-6 sm:p-8 rounded-2xl border"
+                     :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                <div class="text-[11px] font-mono uppercase tracking-wider text-zinc-500 mb-3 font-semibold">Abstract</div>
+                <div class="paper-editorial text-sm sm:text-base leading-relaxed space-y-4"
+                     :class="theme === 'dark' ? 'text-zinc-300' : 'text-zinc-800'">
+                    {% for p in report.executive_summary.split('\n\n') %}
+                        {% if p.strip() %}
+                            <p>{{ p.strip() }}</p>
                         {% endif %}
                     {% endfor %}
                 </div>
             </section>
             {% endif %}
 
-            <!-- Empirical Key Takeaways -->
+            <!-- Empirical Synthesis Metrics Matrix -->
+            <section class="p-6 sm:p-7 rounded-2xl border"
+                     :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b"
+                     :class="theme === 'dark' ? 'border-white/[0.06]' : 'border-black/[0.06]'">
+                    <div class="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">1.0 Empirical Corpus Metrics</div>
+                    <span class="text-[10px] font-mono text-apple-emerald bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Zero Information Loss</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-xs">
+                    <div class="p-3 rounded-xl border" :class="theme === 'dark' ? 'bg-black/40 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'">
+                        <div class="text-zinc-500 text-[10px] uppercase">Audio Duration</div>
+                        <div class="text-sm sm:text-base font-bold mt-1" :class="theme === 'dark' ? 'text-white' : 'text-zinc-900'">
+                            {{ (report.metadata.duration // 60) }}m {{ (report.metadata.duration % 60) }}s
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl border" :class="theme === 'dark' ? 'bg-black/40 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'">
+                        <div class="text-zinc-500 text-[10px] uppercase">Reading Time</div>
+                        <div class="text-sm sm:text-base font-bold text-apple-emerald mt-1">
+                            ~{{ (report.metadata.duration // 180)|int + 1 }} min read
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl border" :class="theme === 'dark' ? 'bg-black/40 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'">
+                        <div class="text-zinc-500 text-[10px] uppercase">Compression Ratio</div>
+                        <div class="text-sm sm:text-base font-bold text-apple-blue mt-1">
+                            {{ report.compression_ratio or '85% Compression' }}
+                        </div>
+                    </div>
+                    <div class="p-3 rounded-xl border" :class="theme === 'dark' ? 'bg-black/40 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'">
+                        <div class="text-zinc-500 text-[10px] uppercase">Verified Entities</div>
+                        <div class="text-sm sm:text-base font-bold mt-1" :class="theme === 'dark' ? 'text-white' : 'text-zinc-900'">
+                            {{ report.knowledge_graph.entities|length }} Concepts
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Core Empirical Takeaways -->
             {% if report.key_takeaways %}
             <section class="space-y-4">
-                <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-300 font-mono text-xs font-semibold border border-teal-500/20">EMPIRICAL FINDINGS</span>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 class="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">1.0 Empirical Takeaways</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {% for takeaway in report.key_takeaways %}
-                    <div class="bg-zinc-900/40 p-5 rounded-2xl border border-white/5 hover:border-teal-500/30 transition flex items-start gap-3">
-                        <span class="flex-shrink-0 w-6 h-6 rounded-lg bg-teal-500/20 text-teal-300 font-mono font-bold text-xs flex items-center justify-center mt-0.5 border border-teal-500/30">
+                    <div class="p-4 rounded-xl border flex items-start gap-3 transition"
+                         :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.06] hover:border-white/[0.12]' : 'bg-white border-black/[0.06] hover:border-black/[0.12] shadow-sm'">
+                        <span class="w-5 h-5 rounded-md text-[10px] font-mono font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+                              :class="theme === 'dark' ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-700'">
                             {{ loop.index }}
                         </span>
-                        <span class="text-sm text-zinc-200 leading-relaxed font-normal">
+                        <p class="text-xs sm:text-sm leading-relaxed"
+                           :class="theme === 'dark' ? 'text-zinc-300' : 'text-zinc-800'">
                             {{ takeaway }}
-                        </span>
+                        </p>
                     </div>
                     {% endfor %}
                 </div>
             </section>
             {% endif %}
 
-            <!-- Numbered Research Paper Sections -->
-            <section class="space-y-8">
-                <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-300 font-mono text-xs font-semibold border border-purple-500/20">TECHNICAL DOSSIER SECTIONS</span>
-                </div>
+            <!-- Technical Sections (§2.0, §3.0, etc.) -->
+            <section class="space-y-12">
+                <h3 class="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">2.0 Detailed Technical Analysis</h3>
 
                 {% for sec in report.sections %}
-                <article class="bg-zinc-900/30 rounded-3xl p-6 sm:p-10 border border-white/10 relative overflow-hidden backdrop-blur-xl">
-                    <!-- Section Header -->
-                    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-white/5">
-                        <h2 class="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                <article class="p-6 sm:p-8 rounded-2xl border relative transition"
+                         :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                    
+                    <!-- Section Title & Margin Timestamp -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b"
+                         :class="theme === 'dark' ? 'border-white/[0.06]' : 'border-black/[0.06]'">
+                        <h4 class="text-lg sm:text-xl font-bold tracking-tight font-sans"
+                            :class="theme === 'dark' ? 'text-white' : 'text-zinc-950'">
                             §{{ sec.order }}.0 {{ sec.title }}
-                        </h2>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 rounded-md bg-white/5 text-zinc-400 font-mono text-xs border border-white/5">
-                                ⏱️ {{ "%02d:%02d"|format((sec.timestamp_start // 60)|int, (sec.timestamp_start % 60)|int) }} – 
-                                {{ "%02d:%02d"|format((sec.timestamp_end // 60)|int, (sec.timestamp_end % 60)|int) }}
-                            </span>
-                        </div>
+                        </h4>
+                        
+                        <!-- Clickable YouTube Timestamp Anchor -->
+                        {% if report.metadata.video_id %}
+                        <a href="https://youtu.be/{{ report.metadata.video_id }}?t={{ sec.timestamp_start|int }}"
+                           target="_blank" rel="noopener"
+                           class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-mono font-medium border transition hover:opacity-80"
+                           :class="theme === 'dark' ? 'bg-zinc-900 border-white/[0.08] text-zinc-400' : 'bg-zinc-100 border-black/[0.06] text-zinc-600'"
+                           title="Watch source clip at exact timestamp">
+                            <span>⏱️ {{ "%02d:%02d"|format((sec.timestamp_start // 60)|int, (sec.timestamp_start % 60)|int) }}</span>
+                            <span class="text-zinc-500">→</span>
+                        </a>
+                        {% else %}
+                        <span class="text-xs font-mono text-zinc-500">
+                            {{ "%02d:%02d"|format((sec.timestamp_start // 60)|int, (sec.timestamp_start % 60)|int) }}
+                        </span>
+                        {% endif %}
                     </div>
 
-                    <!-- Section Content -->
-                    <div class="prose prose-invert max-w-none text-zinc-300 leading-relaxed space-y-4 text-sm sm:text-base mb-6">
+                    <!-- Editorial Content -->
+                    <div class="paper-editorial text-sm sm:text-base leading-relaxed space-y-4"
+                         :class="theme === 'dark' ? 'text-zinc-300' : 'text-zinc-800'">
                         {% for paragraph in sec.content.split('\n\n') %}
                             {% if paragraph.strip() %}
                                 <p>{{ paragraph.strip() }}</p>
@@ -258,133 +331,168 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Embedded Section Visuals (if assigned) -->
+                    <!-- Embedded Section Figure (if present) -->
                     {% if sec.visuals %}
-                    <div class="grid grid-cols-1 gap-6 my-6">
+                    <div class="my-6 space-y-4">
                         {% for vis in sec.visuals %}
-                        <figure class="rounded-2xl overflow-hidden border border-white/10 bg-black/40 p-4">
-                            <img src="{{ vis.image_path }}" alt="{{ vis.title }}" class="w-full max-h-[420px] object-contain rounded-xl mx-auto">
-                            <figcaption class="mt-3 text-center text-xs font-mono text-zinc-400">
-                                Fig {{ sec.order }}.{{ loop.index }} — {{ vis.title }}
+                        <figure class="p-3 rounded-xl border bg-black/5 text-center"
+                                :class="theme === 'dark' ? 'border-white/[0.08] bg-black/40' : 'border-black/[0.08] bg-zinc-50'">
+                            <img src="/report/{{ job_id or report.metadata.video_id }}/{{ vis.image_path | basename }}" alt="{{ vis.title }}" class="w-full max-h-[420px] object-contain rounded-lg mx-auto bg-black/20" loading="lazy">
+                            <figcaption class="mt-2.5 text-[11px] font-mono text-zinc-500">
+                                Figure {{ sec.order }}.{{ loop.index }} — {{ vis.title }}
                             </figcaption>
                         </figure>
                         {% endfor %}
                     </div>
                     {% endif %}
 
-                    <!-- Key Quotes (if any) -->
+                    <!-- Quotation Ledger (if any) -->
                     {% if sec.key_quotes %}
-                    <div class="mt-6 pt-4 border-t border-white/5 space-y-3">
+                    <div class="mt-6 pt-4 border-t space-y-2.5"
+                         :class="theme === 'dark' ? 'border-white/[0.06]' : 'border-black/[0.06]'">
                         {% for q in sec.key_quotes %}
-                        <blockquote class="pl-4 border-l-2 border-brand-500 text-xs sm:text-sm text-zinc-300 italic">
+                        <blockquote class="pl-3.5 border-l-2 border-apple-blue text-xs sm:text-sm italic font-serif"
+                                    :class="theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'">
                             "{{ q.text }}"
-                            <span class="block not-italic text-[11px] font-mono text-zinc-500 mt-1">
+                            <span class="block not-italic text-[10px] font-mono text-zinc-500 mt-0.5">
                                 — {{ q.speaker or 'Presenter' }} [{{ "%02d:%02d"|format((q.timestamp // 60)|int, (q.timestamp % 60)|int) }}]
                             </span>
                         </blockquote>
                         {% endfor %}
                     </div>
                     {% endif %}
+
                 </article>
                 {% endfor %}
+                <!-- BibTeX Academic Citation Card -->
+                <div class="p-6 rounded-2xl border"
+                     :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b"
+                         :class="theme === 'dark' ? 'border-white/[0.06]' : 'border-black/[0.06]'">
+                        <span class="text-xs font-mono uppercase tracking-wider text-zinc-500 font-semibold">BibTeX Citation</span>
+                        <button @click="copyBibtex" class="text-xs font-mono px-2.5 py-1 rounded bg-white/[0.06] hover:bg-white/[0.1] text-zinc-300 border border-white/[0.08] transition">
+                            <span x-text="bibtexCopied ? '✓ Copied' : 'Copy BibTeX'"></span>
+                        </button>
+                    </div>
+                    <pre class="text-[11px] font-mono leading-relaxed p-3.5 rounded-xl overflow-x-auto text-zinc-400 select-all"
+                         :class="theme === 'dark' ? 'bg-black/60 border border-white/[0.04]' : 'bg-zinc-100 text-zinc-700'">@techreport{{"{"}}vidmash_{{ job_id or report.metadata.video_id }},
+  title       = {{"{"}}{{ report.metadata.title }}{{"}"}},
+  author      = {{"{"}}{{ report.metadata.channel or "Unknown" }}{{"}"}},
+  year        = {{"{"}}{{ now.year }}{{"}"}},
+  institution = {{"{"}}VidMash Autonomous Research Labs{{"}"}},
+  type        = {{"{"}}Academic Research Dossier{{"}"}},
+  url         = {{"{"}}{{ "https://youtu.be/" + report.metadata.video_id if report.metadata.video_id else "" }}{{"}"}}
+{{"}"}}</pre>
+                </div>
+
             </section>
         </div>
 
 
         <!-- ============================================================= -->
-        <!-- TAB 2: LIVE INTELLIGENCE COPILOT (Interactive AI Chat) -->
+        <!-- TAB 2: INTERACTIVE COPILOT (Apple Messages / Notes Style) -->
         <!-- ============================================================= -->
         <div x-show="activeTab === 'copilot'" x-transition>
-            <div class="bg-zinc-900/50 rounded-3xl border border-white/10 p-6 sm:p-8 backdrop-blur-2xl">
-                <!-- Copilot Header -->
-                <div class="flex items-center justify-between pb-6 mb-6 border-b border-white/10">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 to-purple-600 flex items-center justify-center text-lg shadow-md shadow-brand-500/20">
-                            💬
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-bold text-white tracking-tight">VidMash Intelligence Copilot</h3>
-                            <p class="text-xs text-zinc-400">Ask any question grounded directly in the video's transcript & knowledge graph.</p>
-                        </div>
+            <div class="p-6 sm:p-8 rounded-2xl border"
+                 :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                
+                <div class="flex items-center justify-between pb-4 mb-6 border-b"
+                     :class="theme === 'dark' ? 'border-white/[0.06]' : 'border-black/[0.06]'">
+                    <div>
+                        <h3 class="text-base font-semibold tracking-tight"
+                            :class="theme === 'dark' ? 'text-white' : 'text-zinc-950'">
+                            VidMash Grounded Copilot
+                        </h3>
+                        <p class="text-xs text-zinc-500 font-sans">Ask questions directly against this video's verified knowledge corpus.</p>
                     </div>
-                    <span class="hidden sm:inline-flex px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono border border-emerald-500/20">
-                        ONLINE & VERIFIED
+                    <span class="text-[11px] font-mono text-apple-emerald inline-flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-apple-emerald animate-pulse"></span>
+                        Active
                     </span>
                 </div>
 
-                <!-- Suggested Query Pills -->
-                <div class="flex flex-wrap items-center gap-2 mb-6">
-                    <span class="text-xs text-zinc-500">Quick questions:</span>
-                    <button @click="askQuestion('What is the core architecture and purpose?')" class="px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 text-xs text-zinc-300 transition">
-                        Core Architecture?
+                <!-- Suggested Quick Queries -->
+                <div class="flex flex-wrap items-center gap-2 mb-5">
+                    <span class="text-[11px] text-zinc-500 font-mono">Suggested:</span>
+                    <button @click="askQuestion('Summarize the primary thesis and findings.')" class="px-2.5 py-1 rounded-md text-xs border transition hover:opacity-80"
+                            :class="theme === 'dark' ? 'bg-zinc-900 border-white/[0.06] text-zinc-300' : 'bg-zinc-100 border-black/[0.06] text-zinc-700'">
+                        Primary Thesis?
                     </button>
-                    <button @click="askQuestion('Summarize the top implementation action items.')" class="px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 text-xs text-zinc-300 transition">
+                    <button @click="askQuestion('What are the key technical action items?')" class="px-2.5 py-1 rounded-md text-xs border transition hover:opacity-80"
+                            :class="theme === 'dark' ? 'bg-zinc-900 border-white/[0.06] text-zinc-300' : 'bg-zinc-100 border-black/[0.06] text-zinc-700'">
                         Action Items?
                     </button>
-                    <button @click="askQuestion('What are the key technical challenges or risks?')" class="px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/5 text-xs text-zinc-300 transition">
-                        Key Challenges?
+                    <button @click="askQuestion('What tools or software were specifically mentioned?')" class="px-2.5 py-1 rounded-md text-xs border transition hover:opacity-80"
+                            :class="theme === 'dark' ? 'bg-zinc-900 border-white/[0.06] text-zinc-300' : 'bg-zinc-100 border-black/[0.06] text-zinc-700'">
+                        Tools Mentioned?
                     </button>
                 </div>
 
-                <!-- Chat History Window -->
-                <div class="min-h-[300px] max-h-[500px] overflow-y-auto space-y-4 p-4 rounded-2xl bg-black/40 border border-white/5 mb-6" id="chat-messages">
+                <!-- Chat History Box -->
+                <div class="min-h-[300px] max-h-[480px] overflow-y-auto space-y-4 p-4 rounded-xl border mb-5 font-sans"
+                     :class="theme === 'dark' ? 'bg-black/60 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'" id="chat-messages">
                     <template x-for="(msg, idx) in chatMessages" :key="idx">
-                        <div class="space-y-1.5" :class="msg.role === 'user' ? 'text-right' : 'text-left'">
-                            <div class="text-[10px] font-mono text-zinc-500" x-text="msg.role === 'user' ? 'YOU' : 'VIDMASH COPILOT'"></div>
-                            <div class="inline-block max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed"
+                        <div class="space-y-1" :class="msg.role === 'user' ? 'text-right' : 'text-left'">
+                            <div class="text-[10px] font-mono text-zinc-500" x-text="msg.role === 'user' ? 'YOU' : 'COPILOT'"></div>
+                            <div class="inline-block max-w-[85%] p-3.5 rounded-2xl text-xs sm:text-sm leading-relaxed text-left"
                                  :class="msg.role === 'user'
-                                     ? 'bg-brand-600 text-white rounded-br-none text-left'
-                                     : 'bg-zinc-800/80 border border-white/5 text-zinc-200 rounded-bl-none text-left'">
+                                     ? 'bg-apple-blue text-white rounded-br-none'
+                                     : (theme === 'dark' ? 'bg-zinc-900 border border-white/[0.08] text-zinc-200 rounded-bl-none' : 'bg-white border border-black/[0.08] text-zinc-800 rounded-bl-none shadow-sm')">
                                 <div class="whitespace-pre-wrap" x-text="msg.text"></div>
                                 <template x-if="msg.timestamp">
-                                    <div class="mt-2.5 pt-2 border-t border-white/10 flex items-center gap-2 text-xs font-mono text-teal-300">
-                                        <span>⏱️ Cited at [<span x-text="msg.timestamp"></span>] in section "<span x-text="msg.section"></span>"</span>
+                                    <div class="mt-2 pt-1.5 border-t border-white/[0.08] text-[11px] font-mono text-apple-emerald flex items-center justify-between">
+                                        <span>⏱️ Section "<span x-text="msg.section"></span>"</span>
+                                        <span>[<span x-text="msg.timestamp"></span>]</span>
                                     </div>
                                 </template>
                             </div>
                         </div>
                     </template>
-                    <div x-show="chatLoading" class="flex items-center gap-2 text-xs text-brand-400 font-mono py-2">
+                    <div x-show="chatLoading" class="text-xs font-mono text-apple-blue py-2 flex items-center gap-2">
                         <svg class="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span>Scanning video transcript manifold…</span>
+                        <span>Retrieving grounded excerpt from video manifold…</span>
                     </div>
                 </div>
 
-                <!-- Chat Input Field -->
+                <!-- Chat Input Form -->
                 <form @submit.prevent="sendQuery" class="flex items-center gap-2">
                     <input
                         type="text"
                         x-model="userQuery"
-                        placeholder="Ask anything about this video (e.g. details, quotes, stats)..."
-                        class="flex-1 bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-brand-500 transition"
+                        placeholder="Ask a question about the video's arguments or facts..."
+                        class="flex-1 rounded-xl px-4 py-2.5 text-xs sm:text-sm focus:outline-none border transition"
+                        :class="theme === 'dark' ? 'bg-black/60 border-white/10 text-white placeholder-zinc-500 focus:border-white/30' : 'bg-white border-black/10 text-black placeholder-zinc-400 focus:border-black/30'"
                         :disabled="chatLoading"
                     >
                     <button
                         type="submit"
                         :disabled="chatLoading || !userQuery.trim()"
-                        class="px-5 py-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold text-sm transition disabled:opacity-40 shadow-md">
+                        class="px-4 py-2.5 rounded-xl bg-white text-black font-semibold text-xs sm:text-sm hover:bg-zinc-200 transition disabled:opacity-30">
                         Ask
                     </button>
                 </form>
+
             </div>
         </div>
 
 
         <!-- ============================================================= -->
-        <!-- TAB 3: EMPIRICAL FIGURES & VISUALIZATIONS -->
+        <!-- TAB 3: EMPIRICAL FIGURES -->
         <!-- ============================================================= -->
-        <div x-show="activeTab === 'visuals'" x-transition class="space-y-8">
+        <div x-show="activeTab === 'figures'" x-transition class="space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {% for vis in report.visuals %}
-                <div class="bg-zinc-900/40 rounded-3xl border border-white/10 p-6 overflow-hidden backdrop-blur-xl">
-                    <div class="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
-                        <h4 class="text-base font-bold text-white">{{ vis.title }}</h4>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-brand-500/10 text-brand-300 border border-brand-500/20">
-                            {{ vis.visual_type.value|upper }}
-                        </span>
+                <div class="p-5 rounded-2xl border"
+                     :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b"
+                         :class="theme === 'dark' ? 'border-white/[0.06]' : 'border-black/[0.06]'">
+                        <h4 class="text-xs sm:text-sm font-semibold tracking-tight"
+                            :class="theme === 'dark' ? 'text-white' : 'text-zinc-900'">{{ vis.title }}</h4>
+                        <span class="text-[10px] font-mono text-zinc-500 uppercase">{{ vis.visual_type.value }}</span>
                     </div>
-                    <div class="rounded-xl overflow-hidden bg-black/50 p-2 border border-white/5">
-                        <img src="{{ vis.image_path }}" alt="{{ vis.title }}" class="w-full h-auto object-contain rounded-lg">
+                    <div class="rounded-xl overflow-hidden p-2 bg-black/5"
+                         :class="theme === 'dark' ? 'bg-black/40' : 'bg-zinc-50'">
+                        <img src="/report/{{ job_id or report.metadata.video_id }}/{{ vis.image_path | basename }}" alt="{{ vis.title }}" class="w-full h-auto object-contain rounded-lg bg-black/20" loading="lazy">
                     </div>
                 </div>
                 {% endfor %}
@@ -395,15 +503,19 @@
         <!-- ============================================================= -->
         <!-- TAB 4: KNOWLEDGE GRAPH & ENTITIES -->
         <!-- ============================================================= -->
-        <div x-show="activeTab === 'knowledge'" x-transition class="space-y-8">
-            <!-- Entities Grid -->
-            <div class="bg-zinc-900/40 rounded-3xl p-6 sm:p-8 border border-white/10 backdrop-blur-xl">
-                <h3 class="text-lg font-bold text-white mb-4">Extracted Entity Manifold</h3>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+        <div x-show="activeTab === 'knowledge'" x-transition class="space-y-6">
+            <!-- Entities -->
+            <div class="p-6 sm:p-8 rounded-2xl border"
+                 :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                <h4 class="text-sm font-semibold mb-4" :class="theme === 'dark' ? 'text-white' : 'text-zinc-950'">
+                    Identified Entity Corpus
+                </h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
                     {% for entity in report.knowledge_graph.entities %}
-                    <div class="p-3 rounded-xl bg-black/40 border border-white/5 flex flex-col justify-between">
-                        <span class="text-sm font-semibold text-zinc-100 font-mono">{{ entity.name }}</span>
-                        <span class="text-[10px] text-brand-400 uppercase mt-1">{{ entity.entity_type }} (x{{ entity.mentions }})</span>
+                    <div class="p-2.5 rounded-lg border text-xs"
+                         :class="theme === 'dark' ? 'bg-black/40 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'">
+                        <div class="font-medium font-mono" :class="theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'">{{ entity.name }}</div>
+                        <div class="text-[10px] text-zinc-500 mt-0.5">{{ entity.entity_type }} ({{ entity.mentions }}x)</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -411,17 +523,21 @@
 
             <!-- Relationships -->
             {% if report.knowledge_graph.relationships %}
-            <div class="bg-zinc-900/40 rounded-3xl p-6 sm:p-8 border border-white/10 backdrop-blur-xl">
-                <h3 class="text-lg font-bold text-white mb-4">Empirical Relationship Topology</h3>
-                <div class="divide-y divide-white/5">
+            <div class="p-6 sm:p-8 rounded-2xl border"
+                 :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                <h4 class="text-sm font-semibold mb-4" :class="theme === 'dark' ? 'text-white' : 'text-zinc-950'">
+                    Entity Relationship Topography
+                </h4>
+                <div class="divide-y text-xs font-mono"
+                     :class="theme === 'dark' ? 'divide-white/[0.06]' : 'divide-black/[0.06]'">
                     {% for rel in report.knowledge_graph.relationships %}
-                    <div class="py-3 flex items-center justify-between text-xs font-mono">
+                    <div class="py-2.5 flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="text-white font-bold">{{ rel.source }}</span>
+                            <span class="font-semibold" :class="theme === 'dark' ? 'text-white' : 'text-zinc-900'">{{ rel.source }}</span>
                             <span class="text-zinc-500">→ [{{ rel.relation_type }}] →</span>
-                            <span class="text-teal-300 font-bold">{{ rel.target }}</span>
+                            <span class="font-semibold text-apple-blue">{{ rel.target }}</span>
                         </div>
-                        <span class="text-zinc-600">confidence: {{ "%.2f"|format(rel.strength) }}</span>
+                        <span class="text-zinc-500 text-[11px]">{{ "%.2f"|format(rel.strength) }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -431,43 +547,65 @@
 
 
         <!-- ============================================================= -->
-        <!-- TAB 5: ACTION MATRIX & QUOTATIONS -->
+        <!-- TAB 5: ACTION MATRIX -->
         <!-- ============================================================= -->
-        <div x-show="activeTab === 'actions'" x-transition class="space-y-8">
-            <!-- Action Items Table -->
-            <div class="bg-zinc-900/40 rounded-3xl p-6 sm:p-8 border border-white/10 backdrop-blur-xl">
-                <h3 class="text-lg font-bold text-white mb-6">Actionable Implementation Vectors</h3>
-                <div class="space-y-3">
+        <div x-show="activeTab === 'actions'" x-transition>
+            <div class="p-6 sm:p-8 rounded-2xl border"
+                 :class="theme === 'dark' ? 'bg-[#0E0E11] border-white/[0.08]' : 'bg-white border-black/[0.08] shadow-sm'">
+                <h4 class="text-sm font-semibold mb-6" :class="theme === 'dark' ? 'text-white' : 'text-zinc-950'">
+                    Actionable Implementation Vectors
+                </h4>
+                <div class="space-y-2.5">
                     {% for action in report.action_items %}
-                    <div class="p-4 rounded-2xl bg-black/40 border border-white/5 flex items-start justify-between gap-4">
-                        <div class="flex items-start gap-3">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase mt-0.5"
-                                  :class="'{{ action.priority }}' === 'high' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-brand-500/20 text-brand-300 border border-brand-500/30'">
-                                {{ action.priority }}
-                            </span>
-                            <span class="text-sm text-zinc-200 leading-snug">{{ action.text }}</span>
-                        </div>
+                    <div class="p-3.5 rounded-xl border flex items-start gap-3"
+                         :class="theme === 'dark' ? 'bg-black/40 border-white/[0.06]' : 'bg-zinc-50 border-black/[0.06]'">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase mt-0.5"
+                              :class="'{{ action.priority }}' === 'high'
+                                  ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                                  : 'bg-zinc-800 text-zinc-300 border border-zinc-700'">
+                            {{ action.priority }}
+                        </span>
+                        <p class="text-xs sm:text-sm leading-relaxed"
+                           :class="theme === 'dark' ? 'text-zinc-300' : 'text-zinc-800'">
+                            {{ action.text }}
+                        </p>
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
 
-    </div>
+    </main>
 
-    <!-- Interactive Report Script -->
+    <!-- App Logic -->
     <script>
     function reportApp(videoId, jobId) {
         return {
+            theme: 'dark',
             activeTab: 'paper',
             videoId: videoId,
             currentJobId: jobId,
             userQuery: '',
+            bibtexCopied: false,
+
+            copyBibtex() {
+                const bib = `@techreport{vidmash_${this.currentJobId},
+  title       = {${JSON.stringify('{{ report.metadata.title }}')}},
+  author      = {${JSON.stringify('{{ report.metadata.channel or "Unknown" }}')}},
+  year        = {${new Date().getFullYear()}},
+  institution = {VidMash Autonomous Research Labs},
+  type        = {Academic Research Dossier}
+}`;
+                navigator.clipboard.writeText(bib).then(() => {
+                    this.bibtexCopied = true;
+                    setTimeout(() => { this.bibtexCopied = false; }, 2000);
+                });
+            },
             chatLoading: false,
             chatMessages: [
                 {
                     role: 'assistant',
-                    text: 'Hello. I have completely deconstructed the video transcript and knowledge graph for this presentation. Ask me any specific question about numbers, architectures, or claims made.',
+                    text: 'Hello. I have fully deconstructed the transcript, timeline, and knowledge graph of this video into a structured technical dossier. Ask any question to verify facts or inspect claims.',
                     timestamp: '',
                     section: ''
                 }
@@ -497,7 +635,7 @@
                 } catch (err) {
                     this.chatMessages.push({
                         role: 'assistant',
-                        text: 'Unable to reach Copilot at this moment. You can still read the detailed sections in the Research Paper tab.',
+                        text: 'Unable to reach the copilot service at this moment. You can view all findings in the White Paper tab.',
                         timestamp: '',
                         section: ''
                     });

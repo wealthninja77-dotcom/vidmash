@@ -22,6 +22,38 @@ from app.config import get_settings
 logger = logging.getLogger(__name__)
 
 
+def clean_transcript_text(text: str) -> str:
+    """Clean and deduplicate speech transcripts, removing rolling subtitle repeats and audio cues."""
+    if not text:
+        return ""
+    
+    # 1. Remove audio annotations: [music], [applause], [laughter], etc.
+    text = re.sub(r"\[[^\]]*(?:music|applause|laughter|cheering|cough|inaudible)[^\]]*\]", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\([^)]*(?:music|applause|laughter|cheering)[^)]*\)", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"[♪♫♩♬]", " ", text)
+    
+    # 2. Normalize whitespace
+    text = re.sub(r"\s+", " ", text).strip()
+    
+    # 3. Iteratively remove repeated words and rolling phrases
+    prev = ""
+    iterations = 0
+    while prev != text and iterations < 4:
+        prev = text
+        # Remove repeated single words ("the the" -> "the", "that that" -> "that")
+        text = re.sub(r"\b([a-zA-Z0-9'\"]+)(?:\s+\1\b)+", r"\1", text, flags=re.IGNORECASE)
+        
+        # Remove repeated phrases from 12 words down to 2 words
+        for n in range(12, 1, -1):
+            pat = rf"\b((?:[a-zA-Z0-9'\"]+[\s\W]+){{{n-1}}}[a-zA-Z0-9'\"]+)(?:\s+\1\b)+"
+            text = re.sub(pat, r"\1", text, flags=re.IGNORECASE)
+        
+        text = re.sub(r"\s+", " ", text).strip()
+        iterations += 1
+        
+    return text
+
+
 class TranscriptService:
     """Retrieve and normalise video transcripts from multiple sources."""
 
@@ -49,13 +81,15 @@ class TranscriptService:
             )
             result: list[dict[str, Any]] = []
             for entry in raw_entries:
-                result.append(
-                    {
-                        "text": entry.get("text", "").strip(),
-                        "start": float(entry.get("start", 0.0)),
-                        "duration": float(entry.get("duration", 0.0)),
-                    }
-                )
+                cleaned = clean_transcript_text(entry.get("text", ""))
+                if cleaned:
+                    result.append(
+                        {
+                            "text": cleaned,
+                            "start": float(entry.get("start", 0.0)),
+                            "duration": float(entry.get("duration", 0.0)),
+                        }
+                    )
             logger.info(
                 "Retrieved %d transcript entries for video %s via youtube_transcript_api",
                 len(result),
@@ -92,7 +126,7 @@ class TranscriptService:
         segments, _ = model.transcribe(audio_path, beam_size=1)
         results: list[dict[str, Any]] = []
         for s in segments:
-            text = s.text.strip()
+            text = clean_transcript_text(s.text)
             if text:
                 results.append(
                     {
@@ -168,7 +202,7 @@ class TranscriptService:
             return self._parse_vtt(vtt_content)
 
     def _parse_vtt(self, vtt_content: str) -> list[dict[str, Any]]:
-        """Parse WebVTT content into structured transcript chunks."""
+        """Parse WebVTT content into structured transcript chunks, eliminating rolling duplicates."""
         cleaned = re.sub(r"WEBVTT[^\n]*\n", "", vtt_content)
         cleaned = re.sub(r"NOTE[^\n]*\n.*?\n\n", "", cleaned, flags=re.DOTALL)
         cleaned = re.sub(r"STYLE[^\n]*\n.*?\n\n", "", cleaned, flags=re.DOTALL)
@@ -179,6 +213,8 @@ class TranscriptService:
         timestamp_re = re.compile(
             r"(\d{2}:)?(\d{2}):(\d{2})[.,](\d{3})\s*-->\s*(\d{2}:)?(\d{2}):(\d{2})[.,](\d{3})"
         )
+
+        last_block_lines: list[str] = []
 
         for block in blocks:
             lines = [ln.strip() for ln in block.splitlines() if ln.strip()]
@@ -212,10 +248,23 @@ class TranscriptService:
             )
             duration = max(0.0, end_sec - start_sec)
 
-            text_lines = lines[time_line_idx + 1 :]
-            text = " ".join(text_lines)
-            text = re.sub(r"<[^>]+>", "", text)
-            text = text.strip()
+            raw_text_lines = lines[time_line_idx + 1 :]
+            # Filter out rolling lines that were already in the previous block
+            unique_lines = []
+            for l in raw_text_lines:
+                clean_l = re.sub(r"<[^>]+>", "", l).strip()
+                if clean_l and clean_l not in last_block_lines:
+                    unique_lines.append(clean_l)
+
+            # If all lines were identical to previous block, use the last line if not strictly identical
+            if not unique_lines and raw_text_lines:
+                clean_last = re.sub(r"<[^>]+>", "", raw_text_lines[-1]).strip()
+                if clean_last and (not last_block_lines or clean_last != last_block_lines[-1]):
+                    unique_lines.append(clean_last)
+
+            last_block_lines = [re.sub(r"<[^>]+>", "", l).strip() for l in raw_text_lines]
+            combined = " ".join(unique_lines).strip()
+            text = clean_transcript_text(combined)
 
             if text:
                 results.append(
